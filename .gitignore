@@ -1,0 +1,10 @@
+# Micromium overlay ignores — never commit a Chromium checkout here
+src/
+out/
+.chromium_src/
+*.pyc
+__pycache__/
+.vs/
+*.ninja
+*.gn.bak
+depot_tools/

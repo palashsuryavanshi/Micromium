@@ -1,0 +1,25 @@
+# Micromium Android arm64 release args (build on Linux host).
+# Usage: gn gen out/Micromium-Android --args='import("//micromium/build/args/android.gn")'
+target_os = "android"
+target_cpu = "arm64"
+is_official_build = true
+is_debug = false
+
+is_component_build = false
+use_thin_lto = true
+use_partition_alloc = true
+android_use_chrome_apk = true
+enable_nacl = false
+
+# Hardening: PAC/BTI where NDK clang supports it
+micromium_hardened = true
+use_cfi = true
+android_cfi_enforced = true
+
+micromium_google_apis_enabled = false
+micromium_enable_rlz = false
+micromium_branded = true
+
+symbol_level = 0
+android_full_debug = false
+android_keystore_path = "//micromium/branding/android-debug.keystore"

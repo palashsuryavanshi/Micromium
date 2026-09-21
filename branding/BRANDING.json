@@ -1,0 +1,11 @@
+{
+  "product_name": "Micromium",
+  "product_description": "Micromium — faster, private Chromium base",
+  "company": "Micromium Project",
+  "version_pin": "153.0.8010.27",
+  "ids": {
+    "windows_app_id": "micromium.browser.stable",
+    "android_package": "org.micromium.browser"
+  },
+  "icons": "TODO: drop 16/32/48/256px PNGs here (product_logo_*.png). Current build reuses Chromium logos."
+}

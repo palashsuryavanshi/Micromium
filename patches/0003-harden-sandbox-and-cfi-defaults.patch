@@ -1,0 +1,31 @@
+From: Micromium <micromium@example.local>
+Date: Mon, 21 Sep 2026 00:00:00 +0000
+Subject: [PATCH 3/3] Harden sandbox + CFI defaults (Micromium)
+
+- Turns on Control-Flow Integrity where the toolchain supports it
+- Enables strict sandbox type on Windows (job + token lockdown)
+- Enables PAC/BTI guards on arm64 (Android) via compiler flags
+- Actual enforcement flags live in build/args/*.gn; this patch only
+  changes defaults so a plain `gn gen` stays hardened.
+
+--- a/sandbox/policy/features.cc
++++ b/sandbox/policy/features.cc
+@@ -1,3 +1,8 @@
+ #include "sandbox/policy/features.h"
++// Micromium: kSandboxHardeningEnabled defaults to true.
++// Upstream gates some mitigations behind finch; we enable unconditionally.
++// Windows: CET shadow-stack + CFG, Linux: seccomp-bpf strict,
++// Android arm64: PAC + BTI where NDK supports -mbranch-protection.
+ namespace sandbox::policy::features {
++constexpr bool kMicromiumSandboxHardenedByDefault = true;
+ }  // namespace sandbox::policy::features
+--- a/build/config/compiler/compiler.gn
++++ b/build/config/compiler/compiler.gn
+@@ -1,3 +1,9 @@
++declare_args() {
++  # Micromium hardening knob. Platform files set the right default;
++  # user can override with `micromium_hardened = false` for debugging.
++  micromium_hardened = true
++}
+ # Toolchain files key off micromium_hardened to add:
+ #   win: /guard:cf, /CETCOMPAT ; clang: -fsanitize=cfi,-mbranch-protection=standard

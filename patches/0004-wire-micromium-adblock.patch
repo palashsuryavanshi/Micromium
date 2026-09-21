@@ -1,0 +1,30 @@
+From: Micromium <micromium@example.local>
+Date: Mon, 21 Sep 2026 00:00:00 +0000
+Subject: [PATCH 4/4] Wire MicromiumAdblock into chrome/browser (DNR)
+
+Adds the GN dependency and feature flag. The actual service sources live
+in src/micromium/components/micromium_adblock/ (copied by overlay), so
+this patch stays small and rebases cleanly.
+
+--- a/chrome/browser/BUILD.gn
++++ b/chrome/browser/BUILD.gn
+@@ -1,3 +1,9 @@
+ source_set("browser") {
++  # Micromium: built-in adblock (DNR-backed). Guarded by
++  # --enable-features=MicromiumAdblock (default on, see default flags).
++  deps += [
++    "//micromium/components/micromium_adblock",
++  ]
+   deps = [
+     "//chrome/common",
+   ]
+--- a/chrome/browser/about_flags.cc
++++ b/chrome/browser/about_flags.cc
+@@ -1,3 +1,8 @@
+ #include "chrome/browser/about_flags.h"
++// Micromium: expose chrome://flags/#micromium-adblock.
++// FEATURE MicromiumAdblock default ENABLED.
++// TODO(micromium): add chrome://settings/micromium-privacy WebUI toggle
++// that writes to profile prefs instead of flags.
+ namespace about_flags {
+ }  // namespace about_flags

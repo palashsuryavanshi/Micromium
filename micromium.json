@@ -1,0 +1,23 @@
+{
+  "name": "Micromium",
+  "description": "Better Chromium base overlay",
+  "chromium": {
+    "repo": "https://github.com/chromium/chromium",
+    "googlesource": "https://chromium.googlesource.com/chromium/src",
+    "tag": "153.0.8010.27",
+    "branch_position": 1681091,
+    "branch": "chromium/6811",
+    "method": "depot_tools + gclient, NOT git clone"
+  },
+  "features": {
+    "degoogle": true,
+    "adblock_builtin": true,
+    "performance_tweaks": true,
+    "security_hardening": true,
+    "custom_branding": true
+  },
+  "targets": ["windows-x64", "linux-x64", "android-arm64"],
+  "build_system": "gn + ninja (autoninja)",
+  "patch_dir": "patches",
+  "components": ["components/micromium_adblock"]
+}

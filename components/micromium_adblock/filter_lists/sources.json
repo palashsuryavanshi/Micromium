@@ -1,0 +1,26 @@
+{
+  "comment": "Upstream filter sources. update_filters.py merges these into filter_lists/micromium-default.txt + dnr_snapshot.json",
+  "version": 1,
+  "sources": [
+    {
+      "name": "easylist",
+      "url": "https://easylist.to/easylist/easylist.txt",
+      "enabled": true,
+      "max_rules": 60000
+    },
+    {
+      "name": "easyprivacy",
+      "url": "https://easylist.to/easylist/easyprivacy.txt",
+      "enabled": true,
+      "max_rules": 40000
+    },
+    {
+      "name": "micromium-local",
+      "file": "micromium-default.txt",
+      "enabled": true
+    }
+  ],
+  "output_bundled": "micromium-default.txt",
+  "output_dnr": "dnr_snapshot.json",
+  "strip_cosmetic": true
+}

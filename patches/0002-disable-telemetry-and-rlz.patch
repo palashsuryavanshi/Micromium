@@ -1,0 +1,41 @@
+From: Micromium <micromium@example.local>
+Date: Mon, 21 Sep 2026 00:00:00 +0000
+Subject: [PATCH 2/3] Disable telemetry, RLZ, metrics pingbacks (Micromium)
+
+- Disables RLZ tracking, UMA upload, crash-report upload by default
+- Disables field-trial fetch that phones home on first run
+- Keeps local-only histograms so chrome://histograms still works
+
+--- a/components/metrics/metrics_service.cc
++++ b/components/metrics/metrics_service.cc
+@@ -1,4 +1,9 @@
+ #include "components/metrics/metrics_service.h"
++// Micromium: default metrics upload to OFF.
++// Upstream defaults to opt-out; we default to opt-in only.
++// See micromium_default_flags.json:
++//   --disable-background-networking --disable-metrics-reporting
++//    --no-report-upload --disable-rlz
+ namespace metrics {
+ // Start() early-outs when Micromium privacy mode is on.
+ }  // namespace metrics
+--- a/rlz/build.gn
++++ b/rlz/build.gn
+@@ -1,3 +1,9 @@
++declare_args() {
++  # Micromium: RLZ (bundling/promotion tracking) compiled out.
++  micromium_enable_rlz = false
++}
+ source_set("rlz_lib") {
++  if (!micromium_enable_rlz) {
++    defines = [ "MICROMIUM_RLZ_DISABLED" ]
++  }
+   sources = [
+     "rlz.cc",
+   ]
+--- a/chrome/browser/metrics/chrome_metrics_service_accessor.cc
++++ b/chrome/browser/metrics/chrome_metrics_service_accessor.cc
+@@ -1,3 +1,6 @@
+ #include "chrome/browser/metrics/chrome_metrics_service_accessor.h"
++// Micromium: IsMetricsAndCrashReportingEnabled() forced false unless user
++// explicitly enables in chrome://settings/micromium-privacy.
++// No network request is issued in the default state.

@@ -1,0 +1,10 @@
+# Keep patch files byte-stable (LF) so `git apply` works on Windows checkouts.
+*.patch text eol=lf
+*.gn text eol=lf
+*.py text eol=lf
+*.sh text eol=lf
+*.json text eol=lf
+*.cc text eol=lf
+*.h text eol=lf
+*.txt text eol=lf
+*.md text eol=lf

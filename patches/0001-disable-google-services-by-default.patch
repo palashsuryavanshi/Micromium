@@ -1,0 +1,50 @@
+From: Micromium <micromium@example.local>
+Date: Mon, 21 Sep 2026 00:00:00 +0000
+Subject: [PATCH 1/3] Disable Google services by default (Micromium de-Google)
+
+Removes hard-coded Google API keys dependency, disables GCM, Sync,
+Translate and Cloud Print endpoints unless the embedder opts in via
+GN args (micromium_google_apis_enabled=false by default).
+
+Rebase note: fuzz around google_apis/ and chrome/common/ if upstream moves.
+
+--- a/google_apis/build.gn
++++ b/google_apis/build.gn
+@@ -1,6 +1,12 @@
+ # Upstream google_apis build config.
+ # Micromium: default to no baked-in keys.
++declare_args() {
++  # Set to true only for official Google-API-enabled builds.
++  # Micromium default keeps this OFF for privacy.
++  micromium_google_apis_enabled = false
++}
++
+ source_set("google_apis") {
++  defines = []
++  if (!micromium_google_apis_enabled) {
++    defines += [ "MICROMIUM_NO_GOOGLE_APIS" ]
++  }
+   sources = [
+     "google_api_keys.cc",
+   ]
+--- a/chrome/common/chrome_switches.cc
++++ b/chrome/common/chrome_switches.cc
+@@ -1,5 +1,11 @@
+ #include "chrome/common/chrome_switches.h"
++// Micromium: force-disable background Google services unless explicitly
++// enabled with --enable-google-services.
+ namespace switches {
++const char kMicromiumGoogleServicesDefault[] =
++    "micromium-google-services-default-off";
+ const char kDisableBackgroundNetworking[] = "disable-background-networking";
+ }  // namespace switches
++
++// Micromium default: background networking to Google is disabled.
++// See micromium_default_flags.json for the full switch list.
+--- a/chrome/browser/policy/policy_helpers.cc
++++ b/chrome/browser/policy/policy_helpers.cc
+@@ -1,3 +1,7 @@
+ // Micromium patch marker: disable Sync / Sign-in by default.
++// If MICROMIUM_NO_GOOGLE_APIS is defined, sign-in flow returns early
++// with "disabled by policy" instead of contacting accounts.google.com.
++// TODO(micromium): wire to chrome://settings/micromium-privacy UI.

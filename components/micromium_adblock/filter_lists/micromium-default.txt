@@ -1,0 +1,5 @@
+! Micromium default filter list (sample — replace with EasyList + EasyPrivacy in production)
+! License: same as EasyList where applicable; this sample is BSD-3-Clause.
+ads.example.com
+tracking.example.net
+@@allow.ads.example.com/safe

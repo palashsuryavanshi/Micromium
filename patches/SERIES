@@ -1,0 +1,4 @@
+0001-disable-google-services-by-default.patch
+0002-disable-telemetry-and-rlz.patch
+0003-harden-sandbox-and-cfi-defaults.patch
+0004-wire-micromium-adblock.patch

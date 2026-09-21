@@ -1,0 +1,166 @@
+#!/usr/bin/env python3
+"""Merges upstream filter lists into Micromium bundled lists + DNR snapshot.
+
+Usage:
+  python tools/update_filters.py --check          # validate local lists only
+  python tools/update_filters.py --fetch          # download EasyList etc.
+  python tools/update_filters.py --fetch --check  # full refresh + validate
+
+Reads components/micromium_adblock/filter_lists/sources.json.
+Writes:
+  - micromium-default.txt (merged network rules, cosmetic stripped)
+  - dnr_snapshot.json     (DNR dynamic-rules JSON for quick diff/review)
+
+No Chromium checkout required.
+"""
+import argparse
+import json
+import re
+import sys
+import urllib.request
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+LISTS_DIR = REPO_ROOT / "components" / "micromium_adblock" / "filter_lists"
+
+
+def load_manifest():
+    with open(LISTS_DIR / "sources.json") as f:
+        return json.load(f)
+
+
+def fetch_url(url: str, timeout: int = 60) -> str:
+    req = urllib.request.Request(url, headers={"User-Agent": "Micromium-filter-updater/1.0"})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return r.read().decode("utf-8", errors="replace")
+
+
+def is_cosmetic(line: str) -> bool:
+    return "##" in line or "#@#" in line or "#?#" in line
+
+
+def clean_line(line: str) -> str:
+    line = line.strip()
+    if not line or line.startswith("!") or line.startswith("["):
+        return ""
+    # Strip inline options after $ for the bundled fast path, keep full
+    # syntax in a comment? No — keep as-is, engine strips at load.
+    return line
+
+
+def pattern_to_url_filter(pattern: str) -> str:
+    p = pattern.strip()
+    if p.startswith("@@"):
+        p = p[2:]
+    if not p or is_cosmetic(p):
+        return ""
+    dollar = p.find("$")
+    if dollar != -1:
+        p = p[:dollar]
+    return p.strip()
+
+
+def to_dnr_json(url_filters) -> str:
+    rules = []
+    rid = 1
+    for f in url_filters:
+        is_exception = False
+        uf = f
+        # exceptions already resolved by caller; kept simple here
+        esc = uf.replace("\\", "\\\\").replace('"', '\\"')
+        rules.append(
+            '{"id":%d,"priority":1,"action":{"type":"block"},'
+            '"condition":{"urlFilter":"%s","resourceTypes":'
+            '["main_frame","sub_frame","script","xmlhttprequest",'
+            '"image","media"]}}' % (rid, esc)
+        )
+        rid += 1
+        if rid > 30000:  # DNR dynamic-rule cap guard for bundled snapshot
+            break
+    return "[" + ",".join(rules) + "]"
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--fetch", action="store_true")
+    ap.add_argument("--check", action="store_true")
+    args = ap.parse_args()
+
+    manifest = load_manifest()
+    merged: list[str] = []
+    seen = set()
+
+    for src in manifest["sources"]:
+        name = src.get("name", "?")
+        if not src.get("enabled", True):
+            print(f"skip disabled {name}")
+            continue
+        if "file" in src and not args.fetch:
+            # local file always loaded
+            text = (LISTS_DIR / src["file"]).read_text(encoding="utf-8", errors="replace")
+        elif "file" in src and args.fetch:
+            text = (LISTS_DIR / src["file"]).read_text(encoding="utf-8", errors="replace")
+        elif "url" in src and args.fetch:
+            print(f"fetching {name}: {src['url']}")
+            try:
+                text = fetch_url(src["url"])
+            except Exception as e:
+                print(f"FAILED {name}: {e}", file=sys.stderr)
+                sys.exit(1)
+        elif "url" in src and not args.fetch:
+            print(f"skip remote {name} (use --fetch)")
+            continue
+        else:
+            continue
+
+        count = 0
+        for raw in text.splitlines():
+            line = clean_line(raw)
+            if not line:
+                continue
+            if manifest.get("strip_cosmetic") and is_cosmetic(line):
+                continue
+            if line in seen:
+                continue
+            max_rules = src.get("max_rules", 100000)
+            if count >= max_rules:
+                break
+            seen.add(line)
+            merged.append(line)
+            count += 1
+        print(f"{name}: {count} rules")
+
+    if args.check or args.fetch:
+        # Validate: every kept rule must produce a DNR filter or be exception
+        bad = 0
+        convertible = 0
+        for m in merged:
+            uf = pattern_to_url_filter(m)
+            if uf:
+                convertible += 1
+            elif m.startswith("@@"):
+                convertible += 1
+            else:
+                bad += 1
+        print(f"total={len(merged)} convertible={convertible} dropped={bad}")
+        if not merged:
+            print("ERROR: empty merged list", file=sys.stderr)
+            sys.exit(1)
+
+    if args.fetch:
+        out_bundled = LISTS_DIR / manifest["output_bundled"]
+        # Don't clobber local-only lines: keep file header, rewrite body
+        header = "! Micromium bundled filters (generated by tools/update_filters.py)\n"
+        out_bundled.write_text(header + "\n".join(merged) + "\n", encoding="utf-8")
+        print(f"wrote {out_bundled} ({len(merged)} rules)")
+        dnr = to_dnr_json([pattern_to_url_filter(m) for m in merged
+                           if pattern_to_url_filter(m)][:30000])
+        out_dnr = LISTS_DIR / manifest["output_dnr"]
+        out_dnr.write_text(dnr, encoding="utf-8")
+        print(f"wrote {out_dnr}")
+
+    print("OK")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,22 @@
+# Micromium Linux x64 release args.
+# Usage: gn gen out/Micromium --args='import("//micromium/build/args/linux.gn")'
+is_official_build = true
+is_debug = false
+target_cpu = "x64"
+target_os = "linux"
+
+is_component_build = false
+use_thin_lto = true
+use_partition_alloc = true
+use_vaapi = true
+enable_nacl = false
+
+micromium_hardened = true
+use_cfi = true
+use_seccomp_bpf = true
+
+micromium_google_apis_enabled = false
+micromium_enable_rlz = false
+micromium_branded = true
+
+symbol_level = 1

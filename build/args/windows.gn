@@ -1,0 +1,32 @@
+# Micromium Windows x64 release args.
+# Usage: gn gen out/Micromium --args='import("//micromium/build/args/windows.gn")'
+is_official_build = true
+is_debug = false
+target_cpu = "x64"
+target_os = "win"
+
+# Performance
+is_component_build = false
+use_thin_lto = true
+thin_lto_enable_optimizations = true
+chrome_pgo_phase = 0
+use_partition_alloc = true
+enable_nacl = false
+
+# Hardening (matches patches/0003)
+micromium_hardened = true
+use_cfi = true
+win_enable_cfg_guards = true
+win_enable_cet_shadow_stack = true
+
+# Privacy / de-Google
+micromium_google_apis_enabled = false
+micromium_enable_rlz = false
+
+# Branding
+micromium_branded = true
+chrome_channel = "stable"
+
+# Keep symbols small for local builds; official bots can set symbol_level=2
+symbol_level = 1
+blink_symbol_level = 0

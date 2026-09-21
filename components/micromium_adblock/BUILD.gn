@@ -1,0 +1,35 @@
+# Micromium Adblock component (overlay)
+#
+# Drop-in location in a Chromium checkout:
+#   src/micromium/components/micromium_adblock/
+# Wired via chrome/browser/BUILD.gn dependency added by apply_patches overlay step.
+#
+# Design: thin C++ service wrapping declarativeNetRequest + bundled filter
+# lists. No third-party Rust dependency required to build the base; a
+# production fork can swap Engine for adblock-rust via CXX bridge.
+
+static_library("micromium_adblock") {
+  sources = [
+    "adblock_dnr_bridge.cc",
+    "adblock_dnr_bridge.h",
+    "adblock_engine.cc",
+    "adblock_engine.h",
+    "adblock_service.cc",
+    "adblock_service.h",
+  ]
+  deps = [
+    "//base",
+    "//url",
+    "//components/declarative_net_request",
+  ]
+  defines = [ "MICROMIUM_ADBLOCK_BUILTIN" ]
+}
+
+source_set("unit_tests") {
+  testonly = true
+  sources = [ "adblock_engine_unittest.cc" ]
+  deps = [
+    ":micromium_adblock",
+    "//testing/gtest",
+  ]
+}
