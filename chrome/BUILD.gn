@@ -1,0 +1,36 @@
+# Micromium chrome/ overlay.
+#
+# Drop-in location in a Chromium checkout: src/micromium/chrome/
+# Copied by `tools/apply_patches.py --overlay`.
+#
+# Contents:
+#   micromium_prefs.*            - profile prefs registration
+#   adblock_service_factory.*    - per-profile AdblockService (was referenced
+#                                 by patch 0004 but never shipped; fixed here)
+#   micromium_privacy_handler.*  - WebUI message handler for
+#                                 chrome://settings/micromium-privacy
+#   resources/                  - settings subpage frontend (html + ts)
+#
+# Upstream wiring (patches/0005):
+#   - chrome/browser/BUILD.gn deps += //micromium/chrome
+#   - WebUI controller factory registers MicromiumPrivacyUI
+#   - Profile prefs registered at startup
+
+source_set("micromium_chrome") {
+  sources = [
+    "adblock_service_factory.cc",
+    "adblock_service_factory.h",
+    "micromium_prefs.cc",
+    "micromium_prefs.h",
+    "micromium_privacy_handler.cc",
+    "micromium_privacy_handler.h",
+  ]
+  deps = [
+    "//base",
+    "//components/prefs",
+    "//components/keyed_service/content",
+    "//content/public/browser",
+    "//micromium/components/micromium_adblock",
+  ]
+  defines = [ "MICROMIUM_CHROME_LAYER" ]
+}

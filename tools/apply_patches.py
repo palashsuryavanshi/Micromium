@@ -7,8 +7,9 @@ Usage:
   python tools/apply_patches.py --src D:\\chromium-src\\src --patches patches --overlay
 
 --patches: git-apply every entry in patches/SERIES in order.
---overlay: copy components/micromium_adblock, build/args, branding into
-           <src>/micromium/... so `import("//micromium/build/args/...")` works.
+--overlay: copy components/micromium_adblock, chrome/, build/args, branding
+           into <src>/micromium/... so `import("//micromium/build/args/...")`
+           and `//micromium/chrome` work.
 """
 import argparse
 import shutil
@@ -58,6 +59,8 @@ def copy_overlay(src: Path):
     mappings = [
         (REPO_ROOT / "components" / "micromium_adblock",
          dest_root / "components" / "micromium_adblock"),
+        (REPO_ROOT / "chrome",
+         dest_root / "chrome"),
         (REPO_ROOT / "build" / "args",
          dest_root / "build" / "args"),
         (REPO_ROOT / "branding",

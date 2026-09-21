@@ -15,6 +15,7 @@ Exit 0 = ready, 1 = problems found.
 """
 import json
 import py_compile
+import subprocess
 import sys
 from pathlib import Path
 
@@ -76,7 +77,8 @@ def main() -> int:
 
     print("== json ==")
     for f in ["micromium.json", "branding/BRANDING.json",
-              "components/micromium_adblock/filter_lists/sources.json"]:
+              "components/micromium_adblock/filter_lists/sources.json",
+              "components/micromium_adblock/filter_lists/parity_vectors.json"]:
         check_json(ROOT / f)
 
     print("== filters ==")
@@ -109,18 +111,47 @@ def main() -> int:
     comp = ROOT / "components" / "micromium_adblock"
     for src in ["adblock_engine.h", "adblock_engine.cc",
                 "adblock_dnr_bridge.h", "adblock_dnr_bridge.cc",
-                "adblock_service.h", "adblock_service.cc", "BUILD.gn"]:
+                "adblock_service.h", "adblock_service.cc",
+                "rust_matcher.h", "rust_matcher.cc",
+                "RUST_BACKEND.md", "BUILD.gn",
+                "rust/Cargo.toml", "rust/src/lib.rs",
+                "filter_lists/parity_vectors.json"]:
         if (comp / src).exists():
             ok(src)
         else:
             fail(f"component file missing: {src}")
     build_gn = (comp / "BUILD.gn").read_text()
-    for src in ["adblock_dnr_bridge.cc", "adblock_service.cc"]:
+    for src in ["adblock_dnr_bridge.cc", "adblock_service.cc",
+                "rust_matcher.cc", "micromium_use_adblock_rust"]:
         if src not in build_gn:
-            fail(f"BUILD.gn does not list {src}")
+            fail(f"BUILD.gn missing {src}")
+
+    print("== chrome overlay (settings page) ==")
+    chrome = ROOT / "chrome"
+    for src in ["BUILD.gn", "README.md",
+                "micromium_prefs.h", "micromium_prefs.cc",
+                "adblock_service_factory.h", "adblock_service_factory.cc",
+                "micromium_privacy_handler.h",
+                "micromium_privacy_handler.cc",
+                "resources/micromium_privacy.html",
+                "resources/micromium_privacy.ts"]:
+        if (chrome / src).exists():
+            ok(src)
+        else:
+            fail(f"chrome overlay file missing: {src}")
+
+    print("== parity vectors ==")
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "parity_check.py")],
+                       capture_output=True, text=True)
+    print("".join(f"    {l}\n" for l in r.stdout.splitlines()))
+    if r.returncode != 0:
+        fail(f"parity_check.py failed:\n{r.stderr}")
+    else:
+        ok("parity_check.py")
 
     print("== tools ==")
     for t in ["tools/apply_patches.py", "tools/update_filters.py",
+              "tools/parity_check.py",
               "tools/fetch_chromium.ps1", "tools/fetch_chromium.sh",
               "tools/build.ps1", "tools/build.sh"]:
         if (ROOT / t).exists():
@@ -128,9 +159,9 @@ def main() -> int:
         else:
             fail(f"tool missing: {t}")
     try:
-        py_compile.compile(str(ROOT / "tools/apply_patches.py"), doraise=True)
-        py_compile.compile(str(ROOT / "tools/update_filters.py"), doraise=True)
-        py_compile.compile(str(ROOT / "tools/verify.py"), doraise=True)
+        for t in ["tools/apply_patches.py", "tools/update_filters.py",
+                  "tools/parity_check.py", "tools/verify.py"]:
+            py_compile.compile(str(ROOT / t), doraise=True)
         ok("python tools compile")
     except Exception as e:
         fail(f"py_compile: {e}")

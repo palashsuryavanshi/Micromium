@@ -2,12 +2,23 @@
 
 namespace micromium {
 
-AdblockService::AdblockService() = default;
+AdblockService::AdblockService(bool prefer_rust_engine)
+    : engine_(CreateAdblockEngine(prefer_rust_engine)) {}
 AdblockService::~AdblockService() = default;
+
+void AdblockService::SetEnabled(bool enabled) {
+  enabled_ = enabled;
+}
 
 void AdblockService::LoadAndPushRules(const std::string& filter_text,
                                       DnrUpdateCallback cb) {
-  engine_.LoadFilterList(filter_text);
+  if (!enabled_) {
+    if (cb) {
+      cb("[]");  // clear all dynamic rules
+    }
+    return;
+  }
+  engine_->LoadFilterList(filter_text);
   // Convert: split text into convertible DNR rules here so the embedder
   // gets a ready-to-apply JSON blob. Cosmetic rules stay engine-only.
   std::vector<DnrRule> dnr;
@@ -49,7 +60,7 @@ void AdblockService::LoadAndPushRules(const std::string& filter_text,
 }
 
 bool AdblockService::ShouldBlock(const std::string& url) const {
-  return engine_.ShouldBlock(url);
+  return enabled_ && engine_->ShouldBlock(url);
 }
 
 }  // namespace micromium

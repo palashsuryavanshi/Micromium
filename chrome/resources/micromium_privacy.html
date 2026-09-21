@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Micromium Privacy</title>
+  <link rel="stylesheet" href="micromium_privacy.css">
+</head>
+<body>
+  <settings-subpage data-route="MICROMIUM_PRIVACY">
+    <h2>Micromium Privacy</h2>
+    <settings-toggle-button id="adblockToggle"
+        pref="{{prefs.micromium.adblock.enabled}}"
+        label="Block ads and trackers"></settings-toggle-button>
+    <settings-toggle-button id="autoUpdateToggle"
+        pref="{{prefs.micromium.adblock.auto_update}}"
+        label="Auto-update filter lists"></settings-toggle-button>
+    <settings-toggle-button id="metricsToggle"
+        pref="{{prefs.micromium.privacy.metrics_opt_in}}"
+        label="Help improve Micromium (sends anonymous metrics)"></settings-toggle-button>
+    <cr-button id="resetButton">Reset to Micromium defaults</cr-button>
+    <div id="status"></div>
+  </settings-subpage>
+  <script type="module" src="micromium_privacy.js"></script>
+</body>
+</html>

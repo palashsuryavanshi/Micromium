@@ -1,0 +1,54 @@
+{
+  "comment": "Shared matching-behavior vectors. `fallback` = built-in substring engine (verified by tools/parity_check.py). `rust` = target behavior of the adblock-rust backend — cases where they differ document the syntax gap the Rust swap closes.",
+  "vectors": [
+    {
+      "name": "plain substring block",
+      "rules": ["ads.example.com"],
+      "url": "https://ads.example.com/banner.js",
+      "fallback": true,
+      "rust": true
+    },
+    {
+      "name": "exception overrides block",
+      "rules": ["ads.example.com", "@@allow.ads.example.com/safe"],
+      "url": "https://allow.ads.example.com/safe/logo.png",
+      "fallback": false,
+      "rust": false
+    },
+    {
+      "name": "clean url passes",
+      "rules": ["ads.example.com"],
+      "url": "https://example.com/",
+      "fallback": false,
+      "rust": false
+    },
+    {
+      "name": "domain anchor (needs Rust)",
+      "rules": ["||tracker.example.net^"],
+      "url": "https://tracker.example.net/x.js",
+      "fallback": false,
+      "rust": true
+    },
+    {
+      "name": "options syntax (needs Rust)",
+      "rules": ["banner_$third-party"],
+      "url": "https://cdn.example.com/banner_300x250.png",
+      "fallback": false,
+      "rust": true
+    },
+    {
+      "name": "cosmetic rule never blocks network",
+      "rules": ["example.com##.ad-box"],
+      "url": "https://example.com/",
+      "fallback": false,
+      "rust": false
+    },
+    {
+      "name": "comments and blanks ignored",
+      "rules": ["! a comment", "", "ads.example.com"],
+      "url": "https://ads.example.com/a.js",
+      "fallback": true,
+      "rust": true
+    }
+  ]
+}

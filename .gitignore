@@ -1,6 +1,7 @@
-# Micromium overlay ignores — never commit a Chromium checkout here
-src/
-out/
+# Micromium overlay ignores — never commit a Chromium checkout here.
+# Anchored (leading /) so overlay dirs like rust/src/ are NOT ignored.
+/src/
+/out/
 .chromium_src/
 *.pyc
 __pycache__/

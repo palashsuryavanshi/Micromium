@@ -2,11 +2,19 @@
 #
 # Drop-in location in a Chromium checkout:
 #   src/micromium/components/micromium_adblock/
-# Wired via chrome/browser/BUILD.gn dependency added by apply_patches overlay step.
+# Wired via chrome/browser/BUILD.gn dependency added by patches 0004/0005.
 #
-# Design: thin C++ service wrapping declarativeNetRequest + bundled filter
-# lists. No third-party Rust dependency required to build the base; a
-# production fork can swap Engine for adblock-rust via CXX bridge.
+# Matching backends (see RUST_BACKEND.md):
+#   - Default: built-in substring fallback, no extra toolchain needed.
+#   - Optional: adblock-rust for full EasyList syntax. Enable with
+#       micromium_use_adblock_rust = true
+#     after vendoring the crate (rust/Cargo.toml). The C++ interface is
+#     identical either way (AdblockEngine base class + factory).
+
+declare_args() {
+  # Set true only after `rust/` is vendored into //third_party/rust.
+  micromium_use_adblock_rust = false
+}
 
 static_library("micromium_adblock") {
   sources = [
@@ -16,6 +24,8 @@ static_library("micromium_adblock") {
     "adblock_engine.h",
     "adblock_service.cc",
     "adblock_service.h",
+    "rust_matcher.cc",
+    "rust_matcher.h",
   ]
   deps = [
     "//base",
@@ -23,13 +33,25 @@ static_library("micromium_adblock") {
     "//components/declarative_net_request",
   ]
   defines = [ "MICROMIUM_ADBLOCK_BUILTIN" ]
+  if (micromium_use_adblock_rust) {
+    defines += [ "MICROMIUM_USE_ADBLOCK_RUST" ]
+    deps += [ ":adblock_rust_bridge" ]
+  }
+}
+
+# Rust bridge. Defined only when enabled so the base builds with no Rust
+# toolchain. Uses Chromium's rust_static_library wrapper.
+if (micromium_use_adblock_rust) {
+  import("//build/rust/rust_static_library.gni")
+  rust_static_library("adblock_rust_bridge") {
+    sources = [ "rust/src/lib.rs" ]
+    crate_root = "rust/src/lib.rs"
+    crate_name = "micromium_adblock_bridge"
+  }
 }
 
 source_set("unit_tests") {
   testonly = true
   sources = [ "adblock_engine_unittest.cc" ]
-  deps = [
-    ":micromium_adblock",
-    "//testing/gtest",
-  ]
+  deps = [ ":micromium_adblock" ]
 }

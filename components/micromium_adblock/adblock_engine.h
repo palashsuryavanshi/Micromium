@@ -19,16 +19,18 @@ struct AdblockRule {
 class AdblockEngine {
  public:
   AdblockEngine();
-  ~AdblockEngine();
+  virtual ~AdblockEngine();
 
   // Loads newline-separated filter list text. Lines starting with '!'
   // are comments. "@@" prefix marks an exception rule.
-  void LoadFilterList(const std::string& text);
+  // Virtual so the adblock-rust backend (rust_matcher.h) can substitute
+  // full EasyList syntax behind the same interface.
+  virtual void LoadFilterList(const std::string& text);
 
   // Returns true if |url| should be blocked given loaded rules.
-  bool ShouldBlock(const std::string& url) const;
+  virtual bool ShouldBlock(const std::string& url) const;
 
-  size_t rule_count() const { return rules_.size(); }
+  virtual size_t rule_count() const { return rules_.size(); }
 
  private:
   std::vector<AdblockRule> rules_;

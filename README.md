@@ -24,16 +24,18 @@ branding, and build configs on top — like Brave / Ungoogled-Chromium do.
 ## Layout
 
 ```
-VERSION                     # overlay version (0.1.0)
+VERSION                     # overlay version (0.2.0)
 micromium.json              # version pin + feature toggles (single source of truth)
 tools/verify.py             # readiness check — run this first
 tools/fetch_chromium.ps1    # Windows: installs depot_tools, gclient syncs Chromium
 tools/fetch_chromium.sh     # Linux: same for Linux/Android builds
 tools/apply_patches.py      # applies patches/ series onto src/ (+ --overlay)
 tools/update_filters.py     # merges EasyList/EasyPrivacy -> bundled list + DNR JSON
+tools/parity_check.py       # proves fallback matcher meets parity_vectors.json
 tools/build.ps1 / build.sh  # one-command verify + patch + gn gen + autoninja
-patches/                    # .patch files + SERIES (now 0001-0004)
-components/micromium_adblock/ # engine + DNR bridge + service + filter_lists/
+patches/                    # .patch files + SERIES (0001-0005)
+components/micromium_adblock/ # engine + DNR bridge + service + rust/ backend + filter_lists/
+chrome/                     # prefs + adblock factory + privacy WebUI handler + resources/
 build/args/                 # windows.gn, linux.gn, android.gn
 branding/                   # product name, icons placeholder
 docs/BUILDING.md            # full build instructions

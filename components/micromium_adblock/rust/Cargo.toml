@@ -1,0 +1,15 @@
+[package]
+name = "micromium-adblock-bridge"
+version = "0.1.0"
+edition = "2021"
+# Not published. Vendored into Chromium via
+# //third_party/rust/chromium_crates_io (see ../RUST_BACKEND.md).
+
+[lib]
+crate-type = ["staticlib"]
+name = "micromium_adblock_bridge"
+
+[dependencies]
+# Full EasyList syntax engine (anchors, options, exceptions, cosmetics).
+# Pin the exact version in Cargo.lock when vendoring.
+adblock = "0.8"

@@ -2,3 +2,4 @@
 0002-disable-telemetry-and-rlz.patch
 0003-harden-sandbox-and-cfi-defaults.patch
 0004-wire-micromium-adblock.patch
+0005-micromium-privacy-webui.patch
