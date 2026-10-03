@@ -27,7 +27,10 @@ if [[ ! -f "$SRC_DIR/BUILD.gn" ]]; then
 fi
 
 echo "== Applying overlay =="
-python3 "$REPO_ROOT/tools/apply_patches.py" --src "$SRC_DIR" --patches "$REPO_ROOT/patches"
+case "$PLATFORM" in
+  windows|android) python3 "$REPO_ROOT/tools/apply_patches.py" --src "$SRC_DIR" --patches "$REPO_ROOT/patches" --platform "$PLATFORM" ;;
+  *) python3 "$REPO_ROOT/tools/apply_patches.py" --src "$SRC_DIR" --patches "$REPO_ROOT/patches" ;;
+esac
 python3 "$REPO_ROOT/tools/apply_patches.py" --src "$SRC_DIR" --overlay
 
 if [[ -z "$OUT_DIR" ]]; then

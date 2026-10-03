@@ -18,6 +18,7 @@
   },
   "targets": ["windows-x64", "linux-x64", "android-arm64"],
   "build_system": "gn + ninja (autoninja)",
-  "patch_dir": "patches",
+  "patch_dir": "patches (common) + windows/patches + android/patches (platform)",
+  "platform_dirs": ["windows", "android"],
   "components": ["components/micromium_adblock"]
 }

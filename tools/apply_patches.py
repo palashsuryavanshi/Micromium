@@ -3,10 +3,12 @@
 
 Usage:
   python tools/apply_patches.py --src D:\\chromium-src\\src --patches patches
+  python tools/apply_patches.py --src D:\\chromium-src\\src --patches patches --platform windows
   python tools/apply_patches.py --src D:\\chromium-src\\src --overlay
-  python tools/apply_patches.py --src D:\\chromium-src\\src --patches patches --overlay
 
---patches: git-apply every entry in patches/SERIES in order.
+--patches: git-apply every entry in <patches>/SERIES in order.
+--platform: after the common series, also apply <platform>/patches/SERIES.
+  One of: windows, android. Omit for common-only.
 --overlay: copy components/micromium_adblock, chrome/, build/args, branding
            into <src>/micromium/... so `import("//micromium/build/args/...")`
            and `//micromium/chrome` work.
@@ -86,7 +88,9 @@ def copy_overlay(src: Path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", required=True, help="Path to Chromium src/ dir")
-    ap.add_argument("--patches", help="Path to patches/ dir (this repo)")
+    ap.add_argument("--patches", help="Path to common patches/ dir (this repo)")
+    ap.add_argument("--platform", choices=["windows", "android"],
+                    help="Also apply <platform>/patches/SERIES after common")
     ap.add_argument("--overlay", action="store_true", help="Copy overlay files")
     args = ap.parse_args()
 
@@ -102,6 +106,17 @@ def main():
             patches_dir = (Path.cwd() / patches_dir).resolve()
         if not apply_patches(src, patches_dir):
             failed = True
+        if args.platform:
+            platform_dir = REPO_ROOT / args.platform / "patches"
+            if not platform_dir.is_dir():
+                print(f"Platform patch dir missing: {platform_dir}", file=sys.stderr)
+                failed = True
+            elif not apply_patches(src, platform_dir):
+                failed = True
+    elif args.platform:
+        print("--platform needs --patches <common dir> (applies common first, then platform).",
+              file=sys.stderr)
+        failed = True
     if args.overlay:
         copy_overlay(src)
 

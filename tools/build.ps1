@@ -25,7 +25,12 @@ if (!(Test-Path -LiteralPath (Join-Path $SrcDir "BUILD.gn"))) {
 }
 
 Write-Host "== Applying overlay =="
-python "$RepoRoot\tools\apply_patches.py" --src $SrcDir --patches "$RepoRoot\patches"
+$PlatformPatches = @{ windows = "windows"; android = "android" }[$Platform]
+if ($PlatformPatches) {
+  python "$RepoRoot\tools\apply_patches.py" --src $SrcDir --patches "$RepoRoot\patches" --platform $PlatformPatches
+} else {
+  python "$RepoRoot\tools\apply_patches.py" --src $SrcDir --patches "$RepoRoot\patches"
+}
 if ($LASTEXITCODE -ne 0) { throw "patches failed — rebase needed." }
 python "$RepoRoot\tools\apply_patches.py" --src $SrcDir --overlay
 if ($LASTEXITCODE -ne 0) { throw "overlay copy failed." }

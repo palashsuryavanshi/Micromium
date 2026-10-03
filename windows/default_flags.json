@@ -1,0 +1,16 @@
+{
+  "comment": "Micromium Windows default switches (applied on top of patches/micromium_default_flags.json).",
+  "switches": [
+    "--disable-background-networking",
+    "--disable-metrics-reporting",
+    "--no-report-upload",
+    "--disable-rlz",
+    "--disable-features=Translate,OptimizationHints,MediaRouter,DialMediaRouteProvider",
+    "--enable-features=MicromiumAdblock,PrivacySandboxSettings4"
+  ],
+  "environment": {
+    "GOOGLE_API_KEY": "",
+    "GOOGLE_DEFAULT_CLIENT_ID": "",
+    "GOOGLE_DEFAULT_CLIENT_SECRET": ""
+  }
+}

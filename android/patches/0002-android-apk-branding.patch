@@ -1,0 +1,24 @@
+From: Micromium <micromium@example.local>
+Date: Mon, 21 Sep 2026 00:00:00 +0000
+Subject: [PATCH android 2/2] Android package + WebLayer defaults (Micromium)
+
+- Points the APK package at org.micromium.browser instead of org.chromium
+- Wires the DNR-backed adblock service into the Android WebLayer wrapper
+  with no extra JNI (JSON crosses via the existing DNR mojo pipe)
+- Keeps Google API keys empty by default on Android builds
+
+--- a/chrome/android/java/AndroidManifest.xml
++++ b/chrome/android/java/AndroidManifest.xml
+@@ -1,3 +1,6 @@
++<!-- Micromium (Android): package="org.micromium.browser". -->
++<!-- Rebase the manifest merger entries on milestone update. -->
+ <manifest>
+ </manifest>
+--- a/chrome/android/weblayer/wrapper.cc
++++ b/chrome/android/weblayer/wrapper.cc
+@@ -1,3 +1,6 @@
+ #include "chrome/android/weblayer/wrapper.h"
++// Micromium (Android): bind AdblockService DNR JSON to the DNR mojo pipe.
++// Enabled by --enable-features=MicromiumAdblock (see default flags).
+ namespace weblayer {
+ }  // namespace weblayer

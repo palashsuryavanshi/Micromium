@@ -75,6 +75,31 @@ def main() -> int:
                 fail(f"SERIES entry missing on disk: {line}")
     check_json(ROOT / "patches" / "micromium_default_flags.json")
 
+    print("== platform patches (windows/ + android/) ==")
+    for plat in ["windows", "android"]:
+        pdir = ROOT / plat / "patches"
+        series = pdir / "SERIES"
+        if not series.exists():
+            fail(f"{plat}/patches/SERIES missing")
+            continue
+        entries = [l.strip() for l in series.read_text().splitlines()
+                   if l.strip() and not l.strip().startswith("#")]
+        if not entries:
+            fail(f"{plat}/patches/SERIES is empty")
+            continue
+        for line in entries:
+            if (pdir / line).exists():
+                ok(f"{plat}/patches/{line}")
+            else:
+                fail(f"SERIES entry missing on disk: {plat}/patches/{line}")
+        for f in [f"{plat}/args.gn", f"{plat}/default_flags.json",
+                  f"{plat}/README.md"]:
+            if (ROOT / f).exists():
+                ok(f)
+            else:
+                fail(f"{f} missing")
+        check_json(ROOT / plat / "default_flags.json")
+
     print("== json ==")
     for f in ["micromium.json", "branding/BRANDING.json",
               "components/micromium_adblock/filter_lists/sources.json",
