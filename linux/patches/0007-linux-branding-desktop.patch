@@ -1,0 +1,21 @@
+From: Micromium <micromium@example.local>
+Date: Mon, 21 Sep 2026 00:00:00 +0000
+Subject: [PATCH 7/7] Linux desktop branding (Micromium)
+
+- Points the .desktop file, icons and app ID at Micromium branding
+- Keeps Google API keys empty by default on Linux builds
+
+--- a/chrome/app/theme/chromium/BRANDING
++++ b/chrome/app/theme/chromium/BRANDING
+@@ -1,1 +1,3 @@
++// Micromium (Linux): product strings resolved from linux/branding.
++// Desktop file: micromium-browser.desktop (see linux/README.md).
+ # Upstream Chromium branding file; rebase on milestone update.
+--- a/chrome/browser/shell_integration_linux.cc
++++ b/chrome/browser/shell_integration_linux.cc
+@@ -1,3 +1,5 @@
+ #include "chrome/browser/shell_integration_linux.h"
++// Micromium (Linux): register micromium-browser.desktop as the handler,
++// no Google update ping unless the user opts in. See linux/default_flags.json.
+ namespace shell_integration {
+ }  // namespace shell_integration

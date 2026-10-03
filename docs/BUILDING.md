@@ -36,18 +36,26 @@ Pin comes from `micromium.json` (`153.0.8010.27`).
 This creates `D:\chromium-src\src` via `gclient sync --revision src@<tag>`.
 Expect 30-80GB and 30min-3h depending on network/disk.
 
-## 3. Apply Micromium patches + overlay
+## 3. Apply Micromium patches + overlay (pick your platform)
 
 ```powershell
-python tools\apply_patches.py --src D:\chromium-src\src --patches patches
-python tools\apply_patches.py --src D:\chromium-src\src --overlay
+# Windows
+python tools\apply_patches.py --src D:\chromium-src\src --platform windows --overlay
+```
+
+```bash
+# Linux / Android (Linux host)
+python3 tools/apply_patches.py --src ~/chromium-src/src --platform linux --overlay
+python3 tools/apply_patches.py --src ~/chromium-src/src --platform android --overlay
 ```
 
 This:
-- applies every patch in `patches/SERIES` with `git apply`
+- applies every patch in `<platform>/patches/SERIES` with `git apply`
+  (each platform folder holds its full 0001-0007 stack — no common dir)
 - copies `components/micromium_adblock` -> `src/micromium/components/...`
 - copies `branding/*` -> `src/micromium/branding/`
 - copies `build/args/*.gn` -> `src/micromium/build/args/`
+- copies `<platform>/default_flags.json` -> `src/micromium/micromium_default_flags.json`
 
 ## 4. Build
 
@@ -79,7 +87,7 @@ Artifacts land in `out/.../`. Install/run per-platform as normal Chromium.
 
 - `gn: command not found` -> depot_tools not in PATH, reopen shell.
 - Patch fails after version bump -> `git apply --reject` output tells you the
-  hunk; rebase manually, regenerate patch with `git diff > patches/xxxx.patch`.
+  hunk; rebase manually, regenerate patch with `git diff > <platform>/patches/xxxx.patch`.
 - Link OOM on 16GB machines -> set `jumbo_build=false`, `symbol_level=0`,
   close browsers/AV, use `autoninja -j4`.
 - Android SDK missing -> run `build/android/envsetup.sh` once.

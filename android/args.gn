@@ -13,7 +13,7 @@ use_partition_alloc = true
 android_use_chrome_apk = true
 enable_nacl = false
 
-# Hardening: PAC/BTI where NDK clang supports it (matches android/patches/0001)
+# Hardening: PAC/BTI where NDK clang supports it (matches android/patches/0003 + 0006)
 micromium_hardened = true
 use_cfi = true
 android_cfi_enforced = true

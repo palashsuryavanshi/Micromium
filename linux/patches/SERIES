@@ -3,3 +3,5 @@
 0003-harden-sandbox-and-cfi-defaults.patch
 0004-wire-micromium-adblock.patch
 0005-micromium-privacy-webui.patch
+0006-linux-seccomp-vaapi.patch
+0007-linux-branding-desktop.patch

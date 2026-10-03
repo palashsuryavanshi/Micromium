@@ -15,7 +15,7 @@ chrome_pgo_phase = 0
 use_partition_alloc = true
 enable_nacl = false
 
-# Hardening (matches windows/patches/0001)
+# Hardening (matches windows/patches/0003 + 0006)
 micromium_hardened = true
 use_cfi = true
 win_enable_cfg_guards = true

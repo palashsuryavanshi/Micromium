@@ -26,12 +26,8 @@ if [[ ! -f "$SRC_DIR/BUILD.gn" ]]; then
   exit 2
 fi
 
-echo "== Applying overlay =="
-case "$PLATFORM" in
-  windows|android) python3 "$REPO_ROOT/tools/apply_patches.py" --src "$SRC_DIR" --patches "$REPO_ROOT/patches" --platform "$PLATFORM" ;;
-  *) python3 "$REPO_ROOT/tools/apply_patches.py" --src "$SRC_DIR" --patches "$REPO_ROOT/patches" ;;
-esac
-python3 "$REPO_ROOT/tools/apply_patches.py" --src "$SRC_DIR" --overlay
+echo "== Applying $PLATFORM patches + overlay =="
+python3 "$REPO_ROOT/tools/apply_patches.py" --src "$SRC_DIR" --platform "$PLATFORM" --overlay
 
 if [[ -z "$OUT_DIR" ]]; then
   case "$PLATFORM" in

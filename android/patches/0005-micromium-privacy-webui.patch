@@ -1,6 +1,6 @@
 From: Micromium <micromium@example.local>
 Date: Mon, 21 Sep 2026 00:00:00 +0000
-Subject: [PATCH 5/5] Micromium privacy settings page + prefs wiring
+Subject: [PATCH 5/7] Micromium privacy settings page + prefs wiring
 
 - Registers micromium.* profile prefs at startup
 - Adds MicromiumPrivacyHandler to SettingsUI
@@ -9,8 +9,10 @@ Subject: [PATCH 5/5] Micromium privacy settings page + prefs wiring
 
 --- a/chrome/browser/BUILD.gn
 +++ b/chrome/browser/BUILD.gn
-@@ -1,4 +1,5 @@
+@@ -1,7 +1,8 @@
  source_set("browser") {
+   # Micromium: built-in adblock (DNR-backed). Guarded by
+   # --enable-features=MicromiumAdblock (default on, see default flags).
    deps += [
 +    "//micromium/chrome",
      "//micromium/components/micromium_adblock",
@@ -28,7 +30,7 @@ Subject: [PATCH 5/5] Micromium privacy settings page + prefs wiring
  }  // namespace chrome
 --- a/chrome/browser/ui/webui/settings/settings_ui.cc
 +++ b/chrome/browser/ui/webui/settings/settings_ui.cc
-@@ -1,3 +1,10 @@
+@@ -1,3 +1,11 @@
  #include "chrome/browser/ui/webui/settings/settings_ui.h"
 +// Micromium: attach the privacy handler so chrome://settings/micromium-privacy
 +// can read/write prefs and toggle AdblockService live.
@@ -42,7 +44,7 @@ Subject: [PATCH 5/5] Micromium privacy settings page + prefs wiring
  }  // namespace settings
 --- a/chrome/browser/resources/settings/route.ts
 +++ b/chrome/browser/resources/settings/route.ts
-@@ -1,3 +1,7 @@
+@@ -1,1 +1,4 @@
 +// Micromium: subpage route for the privacy page.
 +// export const MICROMIUM_PRIVACY = ...createRoute('/micromium-privacy', ...);
 +// See src/micromium/chrome/resources/micromium_privacy.ts for the element.

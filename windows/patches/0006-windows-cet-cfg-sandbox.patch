@@ -1,6 +1,6 @@
 From: Micromium <micromium@example.local>
 Date: Mon, 21 Sep 2026 00:00:00 +0000
-Subject: [PATCH windows 1/2] Windows CET/CFG hardening (Micromium)
+Subject: [PATCH 6/7] Windows CET/CFG hardening (Micromium)
 
 - Enables CET shadow-stack + Control-Flow Guard in the Windows toolchain
 - Turns on strict sandbox job + token lockdown for renderers
@@ -9,7 +9,7 @@ Subject: [PATCH windows 1/2] Windows CET/CFG hardening (Micromium)
 
 --- a/sandbox/policy/win/sandbox_win.cc
 +++ b/sandbox/policy/win/sandbox_win.cc
-@@ -1,3 +1,9 @@
+@@ -1,3 +1,7 @@
  #include "sandbox/policy/win/sandbox_win.h"
 +// Micromium (Windows): strict job + low-box token lockdown by default.
 +// Upstream gates some mitigations behind finch; we enable unconditionally.
@@ -19,7 +19,7 @@ Subject: [PATCH windows 1/2] Windows CET/CFG hardening (Micromium)
  }  // namespace sandbox::policy
 --- a/build/config/win/visual_studio_version.gni
 +++ b/build/config/win/visual_studio_version.gni
-@@ -1,3 +1,9 @@
+@@ -1,1 +1,7 @@
 +declare_args() {
 +  # Micromium (Windows): CFG + CETCOMPAT linker defaults.
 +  # User can override with `micromium_hardened = false` for debugging.

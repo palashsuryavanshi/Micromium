@@ -65,6 +65,6 @@ else
 fi
 
 echo ""
-echo "Done. Next:"
-echo "  python3 tools/apply_patches.py --src $CHECKOUT_DIR/src --patches patches"
-echo "  python3 tools/apply_patches.py --src $CHECKOUT_DIR/src --overlay"
+echo "Done. Next (pick your platform):"
+echo "  python3 tools/apply_patches.py --src $CHECKOUT_DIR/src --platform linux --overlay"
+echo "  python3 tools/apply_patches.py --src $CHECKOUT_DIR/src --platform android --overlay"

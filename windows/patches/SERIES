@@ -1,2 +1,7 @@
-0001-windows-cet-cfg-sandbox.patch
-0002-windows-branding-installer.patch
+0001-disable-google-services-by-default.patch
+0002-disable-telemetry-and-rlz.patch
+0003-harden-sandbox-and-cfi-defaults.patch
+0004-wire-micromium-adblock.patch
+0005-micromium-privacy-webui.patch
+0006-windows-cet-cfg-sandbox.patch
+0007-windows-branding-installer.patch

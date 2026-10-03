@@ -1,5 +1,5 @@
 {
-  "comment": "Micromium default switches appended to every launch unless user overrides. Applied by chrome/app + android WebLayer wrapper.",
+  "comment": "Micromium Linux default switches. Self-contained per-platform file.",
   "switches": [
     "--disable-background-networking",
     "--disable-metrics-reporting",

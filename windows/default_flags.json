@@ -1,5 +1,5 @@
 {
-  "comment": "Micromium Windows default switches (applied on top of patches/micromium_default_flags.json).",
+  "comment": "Micromium Windows default switches. Self-contained per-platform file.",
   "switches": [
     "--disable-background-networking",
     "--disable-metrics-reporting",

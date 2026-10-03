@@ -11,7 +11,7 @@
 #                                 chrome://settings/micromium-privacy
 #   resources/                  - settings subpage frontend (html + ts)
 #
-# Upstream wiring (patches/0005):
+# Upstream wiring (<platform>/patches/0005, e.g. windows/patches/0005-...):
 #   - chrome/browser/BUILD.gn deps += //micromium/chrome
 #   - WebUI controller factory registers MicromiumPrivacyUI
 #   - Profile prefs registered at startup

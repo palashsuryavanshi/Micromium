@@ -71,6 +71,6 @@ solutions = [
 }
 
 Write-Host ""
-Write-Host "Done. Next:"
-Write-Host "  python tools\apply_patches.py --src $SrcDir --patches patches"
-Write-Host "  python tools\apply_patches.py --src $SrcDir --overlay"
+Write-Host "Done. Next (pick your platform):"
+Write-Host "  python tools\apply_patches.py --src $SrcDir --platform windows --overlay"
+Write-Host "  python tools\apply_patches.py --src $SrcDir --platform android --overlay"

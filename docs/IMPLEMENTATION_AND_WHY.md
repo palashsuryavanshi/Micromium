@@ -8,8 +8,8 @@ tuned for Google's products: baked-in Google API keys, metrics/UMA upload,
 crash-report pingbacks, RLZ tracking, Translate/OptimizationHints calling
 home, and field-trial fetches on first run. Every downstream browser
 (Brave, Edge, Ungoogled-Chromium) strips or replaces these. Micromium does
-that work for you in `patches/0001` + `0002`, with the kill-switch list in
-`patches/micromium_default_flags.json`:
+that work for you in `<platform>/patches/0001` + `0002`, with the kill-switch
+list in `<platform>/default_flags.json`:
 `--disable-background-networking --disable-metrics-reporting
 --no-report-upload --disable-rlz --disable-domain-reliability
 --disable-breakpad`.
@@ -19,7 +19,8 @@ A full Chromium checkout is 30–80GB with ~1.8M commits. Forking it means
 you own every rebase conflict forever. Micromium keeps **zero** upstream
 files in this repo. It pins one stable tag (`micromium.json`,
 `153.0.8010.27`) and keeps only:
-- `patches/` — small diffs rebased per milestone,
+- `windows/patches/`, `android/patches/`, `linux/patches/` — self-contained
+  per-platform stacks (0001-0005 baseline + 0006-0007 platform), rebased per milestone,
 - `components/micromium_adblock/` — your own code,
 - `build/args/` — your GN configs,
 - `branding/` — your identity.
@@ -41,8 +42,8 @@ lists from `filter_lists/sources.json` with a 30k-rule DNR cap guard.
 Chromium embedders learn the hard way: `is_official_build=true`,
 ThinLTO, PartitionAlloc, `use_cfi=true`, CET/CFG on Windows, PAC/BTI on
 ARM64 Android, RLZ/Google APIs compiled out. One import line replaces pages
-of wiki-reading, and `patches/0003` flips the sandbox defaults so even a
-plain `gn gen` stays hardened.
+of wiki-reading, and `<platform>/patches/0003` (+ `0006` per platform) flips
+the sandbox defaults so even a plain `gn gen` stays hardened.
 
 ### 5. Reproducible pipeline: verify → fetch → patch → build
 `tools/verify.py` (no network) proves the overlay is sane.
@@ -77,16 +78,19 @@ What happens: clones `depot_tools`, writes a minimal `.gclient` pointing at
 `gclient sync --revision src@153.0.8010.27`. Takes 30min–3h, 30–80GB.
 Linux/Android hosts: `./tools/fetch_chromium.sh --checkout-dir ~/chromium-src`.
 
-### Step 2 — Apply Micromium patches + overlay
+### Step 2 — Apply Micromium patches + overlay (pick your platform)
 ```powershell
-python tools\apply_patches.py --src D:\chromium-src\src --patches patches --overlay
+python tools\apply_patches.py --src D:\chromium-src\src --platform windows --overlay
+# linux:   python3 tools/apply_patches.py --src ~/chromium-src/src --platform linux --overlay
+# android: python3 tools/apply_patches.py --src ~/chromium-src/src --platform android --overlay
 ```
-What happens: `git apply` for each entry in `patches/SERIES` in order
-(0001 de-Google, 0002 telemetry/RLZ, 0003 sandbox/CFI, 0004 adblock wiring),
+What happens: `git apply` for each entry in `<platform>/patches/SERIES` in order
+(0001 de-Google, 0002 telemetry/RLZ, 0003 sandbox/CFI, 0004 adblock wiring,
+0005 privacy WebUI, 0006-0007 platform hardening + branding),
 then copies `components/micromium_adblock` → `src/micromium/components/`,
-`build/args` → `src/micromium/build/args/`, `branding/` and flags JSON.
+`build/args` → `src/micromium/build/args/`, `branding/` and the platform flags JSON.
 If a patch FAILs after you bump the Chromium tag, open the `.rej`, fix the
-hunk in the checkout, regenerate with `git diff > patches/000x-....patch`.
+hunk in the checkout, regenerate with `git diff > <platform>/patches/000x-....patch`.
 
 ### Step 3 — Refresh filter lists (optional but recommended)
 ```powershell

@@ -3,7 +3,7 @@
 
 Checks:
   - micromium.json pin present, VERSION matches layout
-  - patches/SERIES entries exist on disk
+  - per-platform patches (windows/android/linux) SERIES entries exist on disk
   - JSON files parse
   - filter lists validate (same logic as update_filters --check)
   - build/args/*.gn present with required keys
@@ -59,24 +59,10 @@ def main() -> int:
     else:
         ok("LICENSE")
 
-    print("== patches ==")
-    series = ROOT / "patches" / "SERIES"
-    if not series.exists():
-        fail("patches/SERIES missing")
-    else:
-        for line in series.read_text().splitlines():
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            p = ROOT / "patches" / line
-            if p.exists():
-                ok(line)
-            else:
-                fail(f"SERIES entry missing on disk: {line}")
-    check_json(ROOT / "patches" / "micromium_default_flags.json")
-
-    print("== platform patches (windows/ + android/) ==")
-    for plat in ["windows", "android"]:
+    print("== platform patches (windows/ + android/ + linux/) ==")
+    if (ROOT / "patches").exists():
+        fail("legacy common patches/ dir still exists — all patches must live in <platform>/patches/")
+    for plat in ["windows", "android", "linux"]:
         pdir = ROOT / plat / "patches"
         series = pdir / "SERIES"
         if not series.exists():
@@ -99,6 +85,81 @@ def main() -> int:
             else:
                 fail(f"{f} missing")
         check_json(ROOT / plat / "default_flags.json")
+
+    print("== patch file structure ==")
+    import re as _re
+    _hunk = _re.compile(r"^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@")
+    for plat in ["windows", "android", "linux"]:
+        pdir = ROOT / plat / "patches"
+        for patch in sorted(pdir.glob("*.patch")):
+            raw = patch.read_bytes()
+            if b"\r" in raw:
+                fail(f"{plat}/patches/{patch.name} has CRLF — patches must be LF for git apply")
+                continue
+            lines = raw.decode("utf-8").splitlines()
+            expect_plus = False
+            ok_file = True
+            i = 0
+            while i < len(lines):
+                if lines[i].startswith("--- "):
+                    if not (i + 1 < len(lines) and lines[i + 1].startswith("+++ ")):
+                        fail(f"{plat}/patches/{patch.name}: --- without +++")
+                        ok_file = False
+                        break
+                    i += 2
+                    continue
+                m = _hunk.match(lines[i])
+                if m:
+                    j = i + 1
+                    old_c = new_c = 0
+                    while j < len(lines) and lines[j][:1] in (" ", "+", "-") \
+                            and not _hunk.match(lines[j]) \
+                            and not lines[j].startswith("--- "):
+                        if lines[j].startswith("\\ "):
+                            j += 1
+                            continue
+                        if lines[j][:1] in (" ", "-"):
+                            old_c += 1
+                        if lines[j][:1] in (" ", "+"):
+                            new_c += 1
+                        j += 1
+                    exp_old = int(m.group(2)) if m.group(2) is not None else 1
+                    exp_new = int(m.group(4)) if m.group(4) is not None else 1
+                    if old_c != exp_old or new_c != exp_new:
+                        fail(f"{plat}/patches/{patch.name}: hunk {m.group(0)} "
+                             f"body is -{old_c} +{new_c}")
+                        ok_file = False
+                        break
+                    i = j
+                    continue
+                i += 1
+            if ok_file:
+                ok(f"{plat}/patches/{patch.name} structure")
+
+    print("== patch apply smoke test ==")
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "smoke_patch_apply.py")],
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        fail(f"smoke_patch_apply.py failed:\n{r.stdout}\n{r.stderr}")
+    else:
+        for line in r.stdout.splitlines():
+            if line.startswith("smoke ok:") or line.strip() == "SMOKE OK":
+                print(f"    {line}")
+        ok("smoke_patch_apply.py")
+
+    print("== cross-platform patch parity ==")
+    base = None
+    for plat in ["windows", "android", "linux"]:
+        entries = [l.strip() for l in (ROOT / plat / "patches" / "SERIES").read_text().splitlines()
+                   if l.strip() and not l.strip().startswith("#")]
+        shared = [e for e in entries if not e.startswith("0006-") and not e.startswith("0007-")]
+        if base is None:
+            base = shared
+            ok(f"{plat} defines shared baseline ({len(shared)} patches)")
+        elif shared != base:
+            fail(f"{plat}/patches SERIES baseline differs from {base}")
+        else:
+            ok(f"{plat} matches shared baseline ({len(shared)} patches)")
 
     print("== json ==")
     for f in ["micromium.json", "branding/BRANDING.json",
@@ -176,7 +237,7 @@ def main() -> int:
 
     print("== tools ==")
     for t in ["tools/apply_patches.py", "tools/update_filters.py",
-              "tools/parity_check.py",
+              "tools/parity_check.py", "tools/smoke_patch_apply.py",
               "tools/fetch_chromium.ps1", "tools/fetch_chromium.sh",
               "tools/build.ps1", "tools/build.sh"]:
         if (ROOT / t).exists():
@@ -185,7 +246,8 @@ def main() -> int:
             fail(f"tool missing: {t}")
     try:
         for t in ["tools/apply_patches.py", "tools/update_filters.py",
-                  "tools/parity_check.py", "tools/verify.py"]:
+                  "tools/parity_check.py", "tools/smoke_patch_apply.py",
+                  "tools/verify.py"]:
             py_compile.compile(str(ROOT / t), doraise=True)
         ok("python tools compile")
     except Exception as e:

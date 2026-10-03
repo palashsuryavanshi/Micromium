@@ -1,6 +1,6 @@
 From: Micromium <micromium@example.local>
 Date: Mon, 21 Sep 2026 00:00:00 +0000
-Subject: [PATCH android 1/2] Android PAC/BTI hardening (Micromium)
+Subject: [PATCH 6/7] Android PAC/BTI hardening (Micromium)
 
 - Enables pointer-authentication (PAC) + branch-target-identification (BTI)
   guards on arm64 via -mbranch-protection where the NDK clang supports it
@@ -10,7 +10,7 @@ Subject: [PATCH android 1/2] Android PAC/BTI hardening (Micromium)
 
 --- a/build/config/android/config.gni
 +++ b/build/config/android/config.gni
-@@ -1,3 +1,9 @@
+@@ -1,1 +1,7 @@
 +declare_args() {
 +  # Micromium (Android): PAC/BTI + enforced CFI on arm64.
 +  # User can override with `micromium_hardened = false` for debugging.
@@ -20,7 +20,7 @@ Subject: [PATCH android 1/2] Android PAC/BTI hardening (Micromium)
  # Toolchain keys off these to add -mbranch-protection=standard + -fsanitize=cfi.
 --- a/base/android/build_info.cc
 +++ b/base/android/build_info.cc
-@@ -1,3 +1,6 @@
+@@ -1,3 +1,5 @@
  #include "base/android/build_info.h"
 +// Micromium (Android): expose hardened-build marker to chrome://version.
 +// No behavior change besides the marker string.

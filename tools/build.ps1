@@ -24,16 +24,9 @@ if (!(Test-Path -LiteralPath (Join-Path $SrcDir "BUILD.gn"))) {
   throw "No Chromium checkout at $SrcDir. Run tools\fetch_chromium.ps1 first."
 }
 
-Write-Host "== Applying overlay =="
-$PlatformPatches = @{ windows = "windows"; android = "android" }[$Platform]
-if ($PlatformPatches) {
-  python "$RepoRoot\tools\apply_patches.py" --src $SrcDir --patches "$RepoRoot\patches" --platform $PlatformPatches
-} else {
-  python "$RepoRoot\tools\apply_patches.py" --src $SrcDir --patches "$RepoRoot\patches"
-}
+Write-Host "== Applying $Platform patches + overlay =="
+python "$RepoRoot\tools\apply_patches.py" --src $SrcDir --platform $Platform --overlay
 if ($LASTEXITCODE -ne 0) { throw "patches failed — rebase needed." }
-python "$RepoRoot\tools\apply_patches.py" --src $SrcDir --overlay
-if ($LASTEXITCODE -ne 0) { throw "overlay copy failed." }
 
 if ([string]::IsNullOrEmpty($OutDir)) {
   $OutDir = @{ windows = "out\Micromium"; linux = "out/Micromium"; android = "out/Micromium-Android" }[$Platform]

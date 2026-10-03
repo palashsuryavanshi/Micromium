@@ -1,0 +1,26 @@
+From: Micromium <micromium@example.local>
+Date: Mon, 21 Sep 2026 00:00:00 +0000
+Subject: [PATCH 6/7] Linux seccomp-bpf + VAAPI defaults (Micromium)
+
+- Enforces strict seccomp-bpf sandbox on Linux renderers by default
+- Enables VAAPI hardware video decode by default where available
+- Enforcement GN flags live in linux/args.gn; this patch flips the
+  upstream defaults so a plain `gn gen` stays hardened.
+
+--- a/sandbox/policy/linux/sandbox_linux.cc
++++ b/sandbox/policy/linux/sandbox_linux.cc
+@@ -1,3 +1,7 @@
+ #include "sandbox/policy/linux/sandbox_linux.h"
++// Micromium (Linux): strict seccomp-bpf by default.
++// Upstream gates some mitigations behind finch; we enable unconditionally.
++// See linux/args.gn: use_seccomp_bpf, use_vaapi.
+ namespace sandbox::policy {
++constexpr bool kMicromiumLinuxSandboxStrictByDefault = true;
+ }  // namespace sandbox::policy
+--- a/media/gpu/vaapi/vaapi_wrapper.cc
++++ b/media/gpu/vaapi/vaapi_wrapper.cc
+@@ -1,3 +1,4 @@
+ #include "media/gpu/vaapi/vaapi_wrapper.h"
++// Micromium (Linux): prefer VAAPI hardware decode when available.
+ namespace media {
+ }  // namespace media

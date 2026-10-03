@@ -12,7 +12,7 @@ branding, and build configs on top — like Brave / Ungoogled-Chromium do.
 ## Why better than vanilla Chromium?
 
 1. **Privacy / de-Google** — disables telemetry, RLZ, field-trial pingbacks,
-   Google service keys by default. See `patches/`.
+   Google service keys by default. See `<platform>/patches/0001-0002`.
 2. **Built-in adblock** — native `MicromiumAdblock` component using
    Brave-style adblock-rust compatible filter lists + `declarativeNetRequest`.
    See `components/micromium_adblock/`.
@@ -24,16 +24,18 @@ branding, and build configs on top — like Brave / Ungoogled-Chromium do.
 ## Layout
 
 ```
-VERSION                     # overlay version (0.2.0)
+VERSION                     # overlay version (0.3.0)
 micromium.json              # version pin + feature toggles (single source of truth)
 tools/verify.py             # readiness check — run this first
 tools/fetch_chromium.ps1    # Windows: installs depot_tools, gclient syncs Chromium
 tools/fetch_chromium.sh     # Linux: same for Linux/Android builds
-tools/apply_patches.py      # applies patches/ series onto src/ (+ --overlay)
+tools/apply_patches.py      # applies <platform>/patches SERIES onto src/ (+ --overlay)
 tools/update_filters.py     # merges EasyList/EasyPrivacy -> bundled list + DNR JSON
 tools/parity_check.py       # proves fallback matcher meets parity_vectors.json
 tools/build.ps1 / build.sh  # one-command verify + patch + gn gen + autoninja
-patches/                    # .patch files + SERIES (0001-0005)
+windows/                    # full Windows stack: patches/0001-0007 + args.gn + flags
+android/                    # full Android stack: patches/0001-0007 + args.gn + flags
+linux/                      # full Linux stack: patches/0001-0007 + args.gn + flags
 components/micromium_adblock/ # engine + DNR bridge + service + rust/ backend + filter_lists/
 chrome/                     # prefs + adblock factory + privacy WebUI handler + resources/
 build/args/                 # windows.gn, linux.gn, android.gn
@@ -63,13 +65,10 @@ See `docs/BUILDING.md` for Linux / Android and troubleshooting.
 # 1. Fetch upstream Chromium at pinned tag (~30-100GB, takes a while)
 .\tools\fetch_chromium.ps1 -CheckoutDir D:\chromium-src
 
-# 2. Apply Micromium patches
-python tools\apply_patches.py --src D:\chromium-src\src --patches patches
+# 2. Apply Micromium patches (pick your platform — no common dir)
+python tools\apply_patches.py --src D:\chromium-src\src --platform windows --overlay
 
-# 3. Copy overlay components + branding into the checkout
-python tools\apply_patches.py --src D:\chromium-src\src --overlay
-
-# 4. Configure + build (example: Windows release)
+# 3. Configure + build (example: Windows release)
 cd D:\chromium-src\src
 gn gen out\Micromium --args="import(\"//micromium/build/args/windows.gn\")"
 autoninja -C out\Micromium micromium
@@ -81,7 +80,8 @@ See `docs/BUILDING.md` for Linux / Android.
 
 1. Bump `micromium.json` -> `chromium.tag`
 2. Run `tools/fetch_chromium.*` again
-3. Rebase `patches/` if any fail, update `SERIES`
+3. Rebase `<platform>/patches/` if any fail, update that platform's `SERIES`
+   (keep the 0001-0005 baseline identical across windows/android/linux)
 4. Tag `micromium-vX.Y` in this repo
 
 ## License

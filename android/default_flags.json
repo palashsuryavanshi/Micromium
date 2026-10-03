@@ -1,5 +1,5 @@
 {
-  "comment": "Micromium Android default switches (applied on top of patches/micromium_default_flags.json). Consumed by the WebLayer wrapper.",
+  "comment": "Micromium Android default switches. Self-contained per-platform file. Consumed by the WebLayer wrapper.",
   "switches": [
     "--disable-background-networking",
     "--disable-metrics-reporting",
