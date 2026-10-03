@@ -17,7 +17,7 @@ $RepoRoot = Split-Path -Parent $PSScriptRoot
 
 Write-Host "== Micromium preflight =="
 python "$RepoRoot\tools\verify.py"
-if ($LASTEXITCODE -ne 0) { throw "verify.py failed — fix problems above first." }
+if ($LASTEXITCODE -ne 0) { throw "verify.py failed -- fix problems above first." }
 
 $SrcDir = Join-Path $CheckoutDir "src"
 if (!(Test-Path -LiteralPath (Join-Path $SrcDir "BUILD.gn"))) {
@@ -26,7 +26,7 @@ if (!(Test-Path -LiteralPath (Join-Path $SrcDir "BUILD.gn"))) {
 
 Write-Host "== Applying $Platform patches + overlay =="
 python "$RepoRoot\tools\apply_patches.py" --src $SrcDir --platform $Platform --overlay
-if ($LASTEXITCODE -ne 0) { throw "patches failed — rebase needed." }
+if ($LASTEXITCODE -ne 0) { throw "patches failed -- rebase needed." }
 
 if ([string]::IsNullOrEmpty($OutDir)) {
   $OutDir = @{ windows = "out\Micromium"; linux = "out/Micromium"; android = "out/Micromium-Android" }[$Platform]

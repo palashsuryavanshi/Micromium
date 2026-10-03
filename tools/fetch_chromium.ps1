@@ -3,7 +3,7 @@
   Fetches upstream Chromium at the Micromium-pinned stable tag.
 .DESCRIPTION
   Installs depot_tools (if missing) and runs gclient sync. Does NOT use
-  `git clone https://github.com/chromium/chromium` — that mirror cannot build.
+  `git clone https://github.com/chromium/chromium` -- that mirror cannot build.
 .EXAMPLE
   .\tools\fetch_chromium.ps1 -CheckoutDir D:\chromium-src
   .\tools\fetch_chromium.ps1 -CheckoutDir D:\chromium-src -SetupOnly
@@ -40,7 +40,7 @@ if ($SetupOnly) {
 
 $SrcDir = Join-Path $CheckoutDir "src"
 if (!(Test-Path -LiteralPath $SrcDir)) {
-  Write-Host "First sync — fetching Chromium $Tag (30-80GB, be patient) ..."
+  Write-Host "First sync -- fetching Chromium $Tag (30-80GB, be patient) ..."
   New-Item -ItemType Directory -Force -Path $SrcDir | Out-Null
   Push-Location $CheckoutDir
   try {
