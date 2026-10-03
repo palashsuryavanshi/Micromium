@@ -201,7 +201,9 @@ def main() -> int:
                 "rust_matcher.h", "rust_matcher.cc",
                 "RUST_BACKEND.md", "BUILD.gn",
                 "rust/Cargo.toml", "rust/src/lib.rs",
-                "filter_lists/parity_vectors.json"]:
+                "filter_lists/parity_vectors.json",
+                "filter_lists/youtube.txt",
+                "filter_lists/micromium-default.txt"]:
         if (comp / src).exists():
             ok(src)
         else:

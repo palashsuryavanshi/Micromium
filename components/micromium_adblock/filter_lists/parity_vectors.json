@@ -44,6 +44,27 @@
       "rust": false
     },
     {
+      "name": "youtube ad beacon blocked",
+      "rules": ["youtube.com/api/stats/ads"],
+      "url": "https://www.youtube.com/api/stats/ads?ei=abc&el=watch",
+      "fallback": true,
+      "rust": true
+    },
+    {
+      "name": "youtube companion ad blocked",
+      "rules": ["doubleclick.net"],
+      "url": "https://googleads.g.doubleclick.net/pagead/id?client=ca-pub-1",
+      "fallback": true,
+      "rust": true
+    },
+    {
+      "name": "youtube watch page passes",
+      "rules": ["youtube.com/api/stats/ads", "doubleclick.net", "youtube.com/pagead/"],
+      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "fallback": false,
+      "rust": false
+    },
+    {
       "name": "comments and blanks ignored",
       "rules": ["! a comment", "", "ads.example.com"],
       "url": "https://ads.example.com/a.js",

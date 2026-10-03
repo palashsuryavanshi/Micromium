@@ -15,6 +15,11 @@
       "max_rules": 40000
     },
     {
+      "name": "micromium-youtube",
+      "file": "youtube.txt",
+      "enabled": true
+    },
+    {
       "name": "micromium-local",
       "file": "micromium-default.txt",
       "enabled": true

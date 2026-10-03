@@ -1,5 +1,17 @@
 ! Micromium default filter list (sample — replace with EasyList + EasyPrivacy in production)
 ! License: same as EasyList where applicable; this sample is BSD-3-Clause.
+! Hardcoded YouTube rules below are canonical in filter_lists/youtube.txt
+! (kept in sync by tools/update_filters.py --fetch).
 ads.example.com
 tracking.example.net
 @@allow.ads.example.com/safe
+youtube.com/api/stats/ads
+youtube.com/pagead/
+youtube.com/ptracking
+youtube.com/api/stats/qoe
+youtube.com/api/stats/delayplay
+youtube.com/generate_204
+doubleclick.net
+googlesyndication.com
+googleadservices.com
+imasdk.googleapis.com

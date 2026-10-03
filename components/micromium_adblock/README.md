@@ -8,9 +8,12 @@ Blocking happens in the network service via `declarativeNetRequest`.
 - `adblock_engine.{h,cc}` — substring + `@@` exception matcher, unit-tested
 - `adblock_dnr_bridge.{h,cc}` — EasyList pattern → DNR `urlFilter` + JSON
 - `adblock_service.{h,cc}` — loads lists, calls bridge, fires update callback
-- `filter_lists/` — bundled lists + `sources.json` manifest
+- `filter_lists/` — bundled lists + `sources.json` manifest:
+  - `micromium-default.txt` — active bundled set (sample + hardcoded YouTube rules)
+  - `youtube.txt` — hardcoded YouTube adblock, always on, never fetched
+    (merged into the bundled set by `tools/update_filters.py --fetch`)
 
-## Chrome integration (applied by `patches/0004-wire-micromium-adblock.patch`)
+## Chrome integration (applied by `<platform>/patches/0004-wire-micromium-adblock.patch`)
 
 1. `chrome/browser/BUILD.gn` gains:
    ```
@@ -23,9 +26,8 @@ Blocking happens in the network service via `declarativeNetRequest`.
    declarative_net_request::RulesMonitor::UpdateDynamicRules()
    ```
 3. Default enable flag: `--enable-features=MicromiumAdblock`
-   (see `patches/micromium_default_flags.json`).
-4. UI stub: `chrome://settings/micromium-privacy` toggles the feature.
-   Until the WebUI lands, use `chrome://flags/#micromium-adblock`.
+   (see `<platform>/default_flags.json`).
+4. Toggle: `chrome://settings/micromium-privacy` (prefs + live toggle, no restart).
 
 ## Android integration
 

@@ -1,0 +1,23 @@
+! Micromium hardcoded YouTube adblock (ships in-repo, always on, never fetched).
+! Merged into micromium-default.txt by tools/update_filters.py (--fetch keeps
+! these rules: this file is a local source in sources.json, never overwritten).
+! License: BSD-3-Clause (Micromium Project).
+!
+! What this blocks: YouTube ad beacons, companion/banner ad requests, ad
+! telemetry and the third-party ad SDKs the watch page pulls in.
+! NOTE: inline video-ad segments are served from the same
+! googlevideo.com/videoplayback endpoints as the video itself and cannot be
+! distinguished by URL substring. Skipping those needs the adblock-rust
+! backend / player-response handling (see ../RUST_BACKEND.md), not more
+! network rules — do NOT add bare "videoplayback" or "googlevideo.com" here,
+! it breaks all playback.
+youtube.com/api/stats/ads
+youtube.com/pagead/
+youtube.com/ptracking
+youtube.com/api/stats/qoe
+youtube.com/api/stats/delayplay
+youtube.com/generate_204
+doubleclick.net
+googlesyndication.com
+googleadservices.com
+imasdk.googleapis.com
