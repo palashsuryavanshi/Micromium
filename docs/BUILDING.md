@@ -2,8 +2,12 @@
 
 Full Chromium builds are heavy. Minimum recommended:
 
-- Windows 10/11 64-bit, VS2022 17.x, 10.0.22621 SDK, 32GB RAM, 150GB free on D:
-- Ubuntu 22.04+ for Linux/Android builds, 32GB RAM, 150GB free
+- Windows 10/11 64-bit, VS2022 17.x with MSVC v143 + Windows 11 SDK
+  (**10.0.28000.0**, required by Chromium 153's `setup_toolchain.py`), 32GB RAM, 150GB free on D:
+  (`tools/build.ps1` auto-detects VS via vswhere, including custom install paths)
+- Ubuntu 22.04+ for Linux/Android builds (required: Chromium asserts
+  `host_os == "linux"` for Android targets and needs a Debian sysroot for
+  Linux targets — neither configures on a Windows host), 32GB RAM, 150GB free
 - depot_tools in PATH, Python 3.8+, Node 18+ (for some tools)
 - Android: JDK 17, Android SDK + NDK r26+ (installed via `build/android`)
 

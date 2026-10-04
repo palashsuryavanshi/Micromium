@@ -18,7 +18,7 @@ Rebased against Chromium 153.0.8010.27 (branch 1681091).
      # src/micromium/components/micromium_adblock (copied by overlay).
      "//micromium/components/micromium_adblock",
 +    # Micromium: privacy settings page (chrome://settings/micromium-privacy).
-+    "//micromium/chrome",
++    "//micromium/chrome:micromium_chrome",
    ]
 --- a/chrome/browser/prefs/browser_prefs.cc
 +++ b/chrome/browser/prefs/browser_prefs.cc

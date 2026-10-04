@@ -169,19 +169,19 @@ MARKERS = {
         "google_apis/build.gn": "micromium_google_apis_enabled",
         "sandbox/policy/win/sandbox_win.cc": "kMicromiumWinSandboxLockdownByDefault",
         "chrome/app/theme/chromium/BRANDING": "micromium.browser.stable",
-        "chrome/browser/BUILD.gn": '"//micromium/chrome"',
+        "chrome/browser/BUILD.gn": '"//micromium/chrome:micromium_chrome"',
     },
     "android": {
         "google_apis/build.gn": "micromium_google_apis_enabled",
         "build/config/android/config.gni": "micromium_android_branch_protection",
         "chrome/android/java/AndroidManifest.xml": "org.micromium.browser",
-        "chrome/browser/BUILD.gn": '"//micromium/chrome"',
+        "chrome/browser/BUILD.gn": '"//micromium/chrome:micromium_chrome"',
     },
     "linux": {
         "google_apis/build.gn": "micromium_google_apis_enabled",
         "sandbox/policy/linux/sandbox_linux.cc": "kMicromiumLinuxSandboxStrictByDefault",
         "chrome/browser/shell_integration_linux.cc": "micromium-browser.desktop",
-        "chrome/browser/BUILD.gn": '"//micromium/chrome"',
+        "chrome/browser/BUILD.gn": '"//micromium/chrome:micromium_chrome"',
     },
 }
 

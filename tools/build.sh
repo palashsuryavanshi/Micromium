@@ -37,8 +37,8 @@ if [[ -z "$OUT_DIR" ]]; then
   esac
 fi
 case "$PLATFORM" in
-  android) TARGET="micromium_apk" ;;
-  *) TARGET="micromium" ;;
+  android) TARGET="chrome_public_apk" ;;
+  *) TARGET="chrome" ;;
 esac
 
 cd "$SRC_DIR"

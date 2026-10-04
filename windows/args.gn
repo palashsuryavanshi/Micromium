@@ -27,7 +27,6 @@ micromium_enable_rlz = false
 
 # Branding
 micromium_branded = true
-chrome_channel = "stable"
 
 # Keep symbols small for local builds; official bots can set symbol_level=2
 symbol_level = 1

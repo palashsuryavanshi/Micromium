@@ -30,7 +30,10 @@ static_library("micromium_adblock") {
   deps = [
     "//base",
     "//url",
-    "//components/declarative_net_request",
+    # NOTE: no compile-time dep on declarativeNetRequest — the engine only
+    # emits DNR-compatible JSON, consumed at runtime by the chrome/ layer
+    # via the existing DNR mojo pipe. (There is no
+    # //components/declarative_net_request target in Chromium 153.)
   ]
   defines = [ "MICROMIUM_ADBLOCK_BUILTIN" ]
   if (micromium_use_adblock_rust) {
