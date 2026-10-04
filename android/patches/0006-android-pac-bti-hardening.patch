@@ -8,21 +8,18 @@ Subject: [PATCH 6/7] Android PAC/BTI hardening (Micromium)
 - Enforcement GN flags live in android/args.gn; this patch flips the
   upstream defaults so a plain `gn gen` stays hardened.
 
+Rebased against Chromium 153.0.8010.27 (branch 1681091).
+
 --- a/build/config/android/config.gni
 +++ b/build/config/android/config.gni
-@@ -1,1 +1,7 @@
-+declare_args() {
-+  # Micromium (Android): PAC/BTI + enforced CFI on arm64.
-+  # User can override with `micromium_hardened = false` for debugging.
-+  android_cfi_enforced = true
+@@ -9,5 +9,10 @@
+ declare_args() {
++  # Micromium (Android): PAC/BTI + enforced CFI on arm64 (see android/args.gn).
++  micromium_android_cfi_enforced = true
 +  micromium_android_branch_protection = true
-+}
- # Toolchain keys off these to add -mbranch-protection=standard + -fsanitize=cfi.
---- a/base/android/build_info.cc
-+++ b/base/android/build_info.cc
-@@ -1,3 +1,5 @@
- #include "base/android/build_info.h"
-+// Micromium (Android): expose hardened-build marker to chrome://version.
-+// No behavior change besides the marker string.
- namespace base::android {
- }  // namespace base::android
+   # Build incremental targets whenever possible.
+   # See //build/android/incremental_install/README.md for more details.
+   incremental_install = false
++  # Micromium (Android): hardened-build marker, surfaced in chrome://version.
++  micromium_android_hardened_marker = true
+ }

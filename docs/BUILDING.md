@@ -88,6 +88,9 @@ Artifacts land in `out/.../`. Install/run per-platform as normal Chromium.
 - `gn: command not found` -> depot_tools not in PATH, reopen shell.
 - Patch fails after version bump -> `git apply --reject` output tells you the
   hunk; rebase manually, regenerate patch with `git diff > <platform>/patches/xxxx.patch`.
+  Write hunks with trailing context on both sides: this repo's patches are
+  applied with `git apply`, and hunks that end with `+` lines fail unless the
+  hunk reaches end-of-file.
 - Link OOM on 16GB machines -> set `jumbo_build=false`, `symbol_level=0`,
   close browsers/AV, use `autoninja -j4`.
 - Android SDK missing -> run `build/android/envsetup.sh` once.

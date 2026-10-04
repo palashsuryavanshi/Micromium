@@ -14,7 +14,8 @@ enable_nacl = false
 # Hardening: PAC/BTI where NDK clang supports it
 micromium_hardened = true
 use_cfi = true
-android_cfi_enforced = true
+micromium_android_cfi_enforced = true
+micromium_android_branch_protection = true
 
 micromium_google_apis_enabled = false
 micromium_enable_rlz = false

@@ -5,17 +5,20 @@ Subject: [PATCH 7/7] Windows branding + installer defaults (Micromium)
 - Points installer/app IDs at Micromium branding instead of Chromium
 - Keeps Google API keys empty by default on Windows builds
 
+Rebased against Chromium 153.0.8010.27 (branch 1681091).
+
 --- a/chrome/app/theme/chromium/BRANDING
 +++ b/chrome/app/theme/chromium/BRANDING
-@@ -1,1 +1,3 @@
-+// Micromium (Windows): product strings resolved from windows/branding.
-+// App ID: micromium.browser.stable (see windows/README.md).
- # Upstream Chromium branding file; rebase on milestone update.
+@@ -8,3 +8,4 @@
+ MAC_BUNDLE_ID=org.chromium.Chromium
+ MAC_CREATOR_CODE=Cr24
++MICROMIUM_APP_ID=micromium.browser.stable
+ MAC_TEAM_ID=
 --- a/chrome/installer/setup/install.cc
 +++ b/chrome/installer/setup/install.cc
-@@ -1,3 +1,5 @@
+@@ -6,3 +6,5 @@
  #include "chrome/installer/setup/install.h"
-+// Micromium (Windows): install under "Micromium" + no Google update ping
-+// unless the user opts in. See windows/default_flags.json.
- namespace installer {
- }  // namespace installer
+ 
++// Micromium (Windows): installed as "Micromium"; no Google update ping
++// unless the user opts in (see windows/default_flags.json).
+ #include <windows.h>

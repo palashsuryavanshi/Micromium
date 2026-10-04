@@ -6,36 +6,32 @@ Subject: [PATCH 2/7] Disable telemetry, RLZ, metrics pingbacks (Micromium)
 - Disables field-trial fetch that phones home on first run
 - Keeps local-only histograms so chrome://histograms still works
 
+Rebased against Chromium 153.0.8010.27 (branch 1681091).
+
 --- a/components/metrics/metrics_service.cc
 +++ b/components/metrics/metrics_service.cc
-@@ -1,4 +1,9 @@
- #include "components/metrics/metrics_service.h"
-+// Micromium: default metrics upload to OFF.
-+// Upstream defaults to opt-out; we default to opt-in only.
-+// See micromium_default_flags.json:
-+//   --disable-background-networking --disable-metrics-reporting
-+//    --no-report-upload --disable-rlz
- namespace metrics {
- // Start() early-outs when Micromium privacy mode is on.
- }  // namespace metrics
+@@ -1,5 +1,7 @@
+ // Copyright 2014 The Chromium Authors
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
++//
++// Micromium: metrics upload defaults to OFF (opt-in only, see default flags).
+ //------------------------------------------------------------------------------
 --- a/rlz/build.gn
 +++ b/rlz/build.gn
-@@ -1,4 +1,11 @@
+@@ -10,2 +10,6 @@
+ import("//rlz/buildflags/buildflags.gni")
 +declare_args() {
 +  # Micromium: RLZ (bundling/promotion tracking) compiled out.
 +  micromium_enable_rlz = false
 +}
- source_set("rlz_lib") {
-+  if (!micromium_enable_rlz) {
-+    defines = [ "MICROMIUM_RLZ_DISABLED" ]
-+  }
-   sources = [
-     "rlz.cc",
-   ]
+ import("//testing/test.gni")
 --- a/chrome/browser/metrics/chrome_metrics_service_accessor.cc
 +++ b/chrome/browser/metrics/chrome_metrics_service_accessor.cc
-@@ -1,1 +1,4 @@
+@@ -6,3 +6,5 @@
  #include "chrome/browser/metrics/chrome_metrics_service_accessor.h"
-+// Micromium: IsMetricsAndCrashReportingEnabled() forced false unless user
-+// explicitly enables in chrome://settings/micromium-privacy.
-+// No network request is issued in the default state.
+ 
++// Micromium: IsMetricsAndCrashReportingEnabled() stays false unless the user
++// opts in at chrome://settings/micromium-privacy. No request leaves by default.
+ #include <string_view>

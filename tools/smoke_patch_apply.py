@@ -2,9 +2,10 @@
 """Smoke test: proves every platform patch stack applies with `git apply`.
 
 Builds a fake Chromium `src/` tree containing the exact anchor lines each
-patch's context hunks expect, then runs the real
-`tools/apply_patches.py --platform <p> --overlay` path for windows, android
-and linux. Asserts platform markers land in the patched files.
+patch's context hunks expect (mirroring the real 153.0.8010.27 file heads),
+then runs the real `tools/apply_patches.py --platform <p> --overlay` path
+for windows, android and linux. Asserts platform markers land in the
+patched files.
 
 Usage: python tools/smoke_patch_apply.py
 Exit 0 = all three platforms apply cleanly. No network, no checkout needed.
@@ -22,71 +23,77 @@ import apply_patches  # noqa: E402
 COMMON_ANCHORS = {
     "BUILD.gn": "{\n}\n",
     "google_apis/build.gn": (
-        "# Upstream google_apis build config.\n"
-        "# Micromium: default to no baked-in keys.\n"
-        'source_set("google_apis") {\n'
-        "  sources = [\n"
-        '    "google_api_keys.cc",\n'
-        "  ]\n"
-        "}\n"
+        "  # Set these to bake the specified API keys and OAuth client\n"
+        "  # IDs/secrets into your build.\n"
+        "  #\n"
     ),
     "chrome/common/chrome_switches.cc": (
         '#include "chrome/common/chrome_switches.h"\n'
-        "namespace switches {\n"
-        "}  // namespace switches\n"
+        "\n"
+        '#include "build/branding_buildflags.h"\n'
     ),
-    "chrome/browser/policy/policy_helpers.cc": (
-        "// Micromium patch marker: disable Sync / Sign-in by default.\n"
+    "chrome/browser/signin/chrome_signin_client.cc": (
+        '#include "chrome/browser/signin/chrome_signin_client.h"\n'
+        "\n"
+        "#include <stddef.h>\n"
     ),
     "components/metrics/metrics_service.cc": (
-        '#include "components/metrics/metrics_service.h"\n'
-        "namespace metrics {\n"
-        "// Start() early-outs when Micromium privacy mode is on.\n"
-        "}  // namespace metrics\n"
+        "// Copyright 2014 The Chromium Authors\n"
+        "// Use of this source code is governed by a BSD-style license that can be\n"
+        "// found in the LICENSE file.\n"
+        "\n"
+        "//" + "-" * 78 + "\n"
     ),
     "rlz/build.gn": (
-        'source_set("rlz_lib") {\n'
-        "  sources = [\n"
-        '    "rlz.cc",\n'
-        "  ]\n"
-        "}\n"
+        'import("//rlz/buildflags/buildflags.gni")\n'
+        'import("//testing/test.gni")\n'
     ),
     "chrome/browser/metrics/chrome_metrics_service_accessor.cc": (
         '#include "chrome/browser/metrics/chrome_metrics_service_accessor.h"\n'
+        "\n"
+        "#include <string_view>\n"
     ),
     "sandbox/policy/features.cc": (
-        '#include "sandbox/policy/features.h"\n'
         "namespace sandbox::policy::features {\n"
-        "}  // namespace sandbox::policy::features\n"
+        "\n"
+        "#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_FUCHSIA)\n"
     ),
-    "build/config/compiler/compiler.gn": (
-        "# Toolchain files key off micromium_hardened to add:\n"
-        "#   win: /guard:cf, /CETCOMPAT ; clang: -fsanitize=cfi,-mbranch-protection=standard\n"
+    "build/config/compiler/compiler.gni": (
+        'import("//build/toolchain/toolchain.gni")\n'
+        'import("//build_overrides/build.gni")\n'
     ),
     "chrome/browser/BUILD.gn": (
-        'source_set("browser") {\n'
-        "  deps = [\n"
-        '    "//chrome/common",\n'
+        'source_set("browser_process") {\n'
+        "  sources = [\n"
+        '    "browser_process.cc",\n'
+        '    "browser_process.h",\n'
         "  ]\n"
-        "}\n"
+        "  deps = [\n"
+        '    "//base",\n'
+        '    "//chrome/browser/status_icons",\n'
+        "  ]\n"
     ),
     "chrome/browser/about_flags.cc": (
         '#include "chrome/browser/about_flags.h"\n'
-        "namespace about_flags {\n"
-        "}  // namespace about_flags\n"
+        "\n"
+        "#include <iterator>\n"
     ),
     "chrome/browser/prefs/browser_prefs.cc": (
         '#include "chrome/browser/prefs/browser_prefs.h"\n'
-        "namespace chrome {\n"
-        "}  // namespace chrome\n"
+        "\n"
+        "#include <array>\n"
     ),
     "chrome/browser/ui/webui/settings/settings_ui.cc": (
         '#include "chrome/browser/ui/webui/settings/settings_ui.h"\n'
-        "namespace settings {\n"
-        "}  // namespace settings\n"
+        "\n"
+        "#include <stddef.h>\n"
     ),
     "chrome/browser/resources/settings/route.ts": (
-        "// Upstream settings routes live here; rebase the route table on update.\n"
+        "// Copyright 2016 The Chromium Authors\n"
+        "// Use of this source code is governed by a BSD-style license that can be\n"
+        "// found in the LICENSE file.\n"
+        "\n"
+        "import {assert} from 'chrome://resources/js/assert.js';\n"
     ),
 }
 
@@ -94,55 +101,64 @@ PLATFORM_ANCHORS = {
     "windows": {
         "sandbox/policy/win/sandbox_win.cc": (
             '#include "sandbox/policy/win/sandbox_win.h"\n'
-            "namespace sandbox::policy {\n"
-            "}  // namespace sandbox::policy\n"
+            "\n"
+            "#include <windows.h>\n"
         ),
         "build/config/win/visual_studio_version.gni": (
-            "# Toolchain keys off these to add /guard:cf + /CETCOMPAT.\n"
+            "declare_args() {\n"
+            "  # Path to Visual Studio. If empty, the default is used which is to use the\n"
+            "  # automatic toolchain in depot_tools. If set, you must also set the\n"
         ),
         "chrome/app/theme/chromium/BRANDING": (
-            "# Upstream Chromium branding file; rebase on milestone update.\n"
+            "MAC_BUNDLE_ID=org.chromium.Chromium\n"
+            "MAC_CREATOR_CODE=Cr24\n"
+            "MAC_TEAM_ID=\n"
         ),
         "chrome/installer/setup/install.cc": (
             '#include "chrome/installer/setup/install.h"\n'
-            "namespace installer {\n"
-            "}  // namespace installer\n"
+            "\n"
+            "#include <windows.h>\n"
         ),
     },
     "android": {
         "build/config/android/config.gni": (
-            "# Toolchain keys off these to add -mbranch-protection=standard + -fsanitize=cfi.\n"
+            "declare_args() {\n"
+            "  # Build incremental targets whenever possible.\n"
+            "  # See //build/android/incremental_install/README.md for more details.\n"
+            "  incremental_install = false\n"
+            "}\n"
         ),
-        "base/android/build_info.cc": (
-            '#include "base/android/build_info.h"\n'
-            "namespace base::android {\n"
-            "}  // namespace base::android\n"
+        "chrome/android/java/AndroidManifest.xml": (
+            'by a child template that "extends" this file.\n'
+            "-->\n"
+            "\n"
+            '<manifest xmlns:android="http://schemas.android.com/apk/res/android"\n'
         ),
-        "chrome/android/java/AndroidManifest.xml": "<manifest>\n</manifest>\n",
-        "chrome/android/weblayer/wrapper.cc": (
-            '#include "chrome/android/weblayer/wrapper.h"\n'
-            "namespace weblayer {\n"
-            "}  // namespace weblayer\n"
+        "chrome/android/BUILD.gn": (
+            'import("//build/config/android/config.gni")\n'
+            'import("//build/config/cronet/config.gni")\n'
         ),
     },
     "linux": {
         "sandbox/policy/linux/sandbox_linux.cc": (
             '#include "sandbox/policy/linux/sandbox_linux.h"\n'
-            "namespace sandbox::policy {\n"
-            "}  // namespace sandbox::policy\n"
+            "\n"
+            "#include <dirent.h>\n"
         ),
         "media/gpu/vaapi/vaapi_wrapper.cc": (
             '#include "media/gpu/vaapi/vaapi_wrapper.h"\n'
-            "namespace media {\n"
-            "}  // namespace media\n"
+            "\n"
+            "#include <dlfcn.h>\n"
         ),
         "chrome/app/theme/chromium/BRANDING": (
-            "# Upstream Chromium branding file; rebase on milestone update.\n"
+            "MAC_BUNDLE_ID=org.chromium.Chromium\n"
+            "MAC_CREATOR_CODE=Cr24\n"
+            "MAC_TEAM_ID=\n"
         ),
         "chrome/browser/shell_integration_linux.cc": (
             '#include "chrome/browser/shell_integration_linux.h"\n'
-            "namespace shell_integration {\n"
-            "}  // namespace shell_integration\n"
+            "\n"
+            "#include <fcntl.h>\n"
         ),
     },
 }
@@ -150,19 +166,19 @@ PLATFORM_ANCHORS = {
 # file -> marker that must exist after the platform stack applies
 MARKERS = {
     "windows": {
-        "google_apis/build.gn": "MICROMIUM_NO_GOOGLE_APIS",
+        "google_apis/build.gn": "micromium_google_apis_enabled",
         "sandbox/policy/win/sandbox_win.cc": "kMicromiumWinSandboxLockdownByDefault",
         "chrome/app/theme/chromium/BRANDING": "micromium.browser.stable",
         "chrome/browser/BUILD.gn": '"//micromium/chrome"',
     },
     "android": {
-        "google_apis/build.gn": "MICROMIUM_NO_GOOGLE_APIS",
+        "google_apis/build.gn": "micromium_google_apis_enabled",
         "build/config/android/config.gni": "micromium_android_branch_protection",
         "chrome/android/java/AndroidManifest.xml": "org.micromium.browser",
         "chrome/browser/BUILD.gn": '"//micromium/chrome"',
     },
     "linux": {
-        "google_apis/build.gn": "MICROMIUM_NO_GOOGLE_APIS",
+        "google_apis/build.gn": "micromium_google_apis_enabled",
         "sandbox/policy/linux/sandbox_linux.cc": "kMicromiumLinuxSandboxStrictByDefault",
         "chrome/browser/shell_integration_linux.cc": "micromium-browser.desktop",
         "chrome/browser/BUILD.gn": '"//micromium/chrome"',

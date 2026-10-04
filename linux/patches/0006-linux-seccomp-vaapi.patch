@@ -7,20 +7,20 @@ Subject: [PATCH 6/7] Linux seccomp-bpf + VAAPI defaults (Micromium)
 - Enforcement GN flags live in linux/args.gn; this patch flips the
   upstream defaults so a plain `gn gen` stays hardened.
 
+Rebased against Chromium 153.0.8010.27 (branch 1681091).
+
 --- a/sandbox/policy/linux/sandbox_linux.cc
 +++ b/sandbox/policy/linux/sandbox_linux.cc
-@@ -1,3 +1,7 @@
+@@ -6,3 +6,5 @@
  #include "sandbox/policy/linux/sandbox_linux.h"
-+// Micromium (Linux): strict seccomp-bpf by default.
-+// Upstream gates some mitigations behind finch; we enable unconditionally.
-+// See linux/args.gn: use_seccomp_bpf, use_vaapi.
- namespace sandbox::policy {
+ 
++// Micromium (Linux): strict seccomp-bpf by default (see linux/args.gn).
 +constexpr bool kMicromiumLinuxSandboxStrictByDefault = true;
- }  // namespace sandbox::policy
+ #include <dirent.h>
 --- a/media/gpu/vaapi/vaapi_wrapper.cc
 +++ b/media/gpu/vaapi/vaapi_wrapper.cc
-@@ -1,3 +1,4 @@
+@@ -6,3 +6,4 @@
  #include "media/gpu/vaapi/vaapi_wrapper.h"
+ 
 +// Micromium (Linux): prefer VAAPI hardware decode when available.
- namespace media {
- }  // namespace media
+ #include <dlfcn.h>
