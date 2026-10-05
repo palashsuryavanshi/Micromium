@@ -30,7 +30,7 @@ class AdblockEngine {
   // Returns true if |url| should be blocked given loaded rules.
   virtual bool ShouldBlock(const std::string& url) const;
 
-  virtual size_t rule_count() const { return rules_.size(); }
+  virtual size_t rule_count() const;
 
  private:
   std::vector<AdblockRule> rules_;

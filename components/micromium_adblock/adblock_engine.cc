@@ -42,4 +42,8 @@ bool AdblockEngine::ShouldBlock(const std::string& url) const {
   return blocked;
 }
 
+size_t AdblockEngine::rule_count() const {
+  return rules_.size();
+}
+
 }  // namespace micromium
