@@ -13,7 +13,7 @@ Rebased against Chromium 153.0.8010.27 (branch 1681091).
 @@ -15,3 +15,4 @@
  namespace sandbox::policy::features {
  
-+constexpr bool kMicromiumSandboxHardenedByDefault = true;
++[[maybe_unused]] constexpr bool kMicromiumSandboxHardenedByDefault = true;
  #if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_FUCHSIA)
 --- a/build/config/compiler/compiler.gni
 +++ b/build/config/compiler/compiler.gni

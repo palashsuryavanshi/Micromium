@@ -15,7 +15,7 @@ Rebased against Chromium 153.0.8010.27 (branch 1681091).
  #include "sandbox/policy/linux/sandbox_linux.h"
  
 +// Micromium (Linux): strict seccomp-bpf by default (see linux/args.gn).
-+constexpr bool kMicromiumLinuxSandboxStrictByDefault = true;
++[[maybe_unused]] constexpr bool kMicromiumLinuxSandboxStrictByDefault = true;
  #include <dirent.h>
 --- a/media/gpu/vaapi/vaapi_wrapper.cc
 +++ b/media/gpu/vaapi/vaapi_wrapper.cc

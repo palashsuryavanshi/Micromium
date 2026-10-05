@@ -15,7 +15,7 @@ Rebased against Chromium 153.0.8010.27 (branch 1681091).
  #include "sandbox/policy/win/sandbox_win.h"
  
 +// Micromium (Windows): strict job + low-box token lockdown by default.
-+constexpr bool kMicromiumWinSandboxLockdownByDefault = true;
++[[maybe_unused]] constexpr bool kMicromiumWinSandboxLockdownByDefault = true;
  #include <windows.h>
 --- a/build/config/win/visual_studio_version.gni
 +++ b/build/config/win/visual_studio_version.gni
