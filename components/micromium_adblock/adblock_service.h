@@ -28,7 +28,7 @@ class AdblockService : public KeyedService {
   // compiled in (micromium_use_adblock_rust=true). Defaults to the
   // always-available substring fallback.
   explicit AdblockService(bool prefer_rust_engine = false);
-  ~AdblockService();
+  ~AdblockService() override;
 
   // Loads all bundled lists + user lists, rebuilds DNR rules, fires |cb|.
   // When disabled via SetEnabled(false), pushes an empty rule set so the
