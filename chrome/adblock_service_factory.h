@@ -6,6 +6,10 @@
 
 #include "components/keyed_service/content/browser_context_keyed_service_factory.h"
 
+namespace content {
+class BrowserContext;
+}  // namespace content
+
 namespace micromium {
 
 class AdblockService;
@@ -19,7 +23,7 @@ class AdblockServiceFactory : public BrowserContextKeyedServiceFactory {
   AdblockServiceFactory();
   ~AdblockServiceFactory() override;
 
-  std::unique_ptr<KeyedService> BuildServiceInstanceFor(
+  std::unique_ptr<KeyedService> BuildServiceInstanceForBrowserContext(
       content::BrowserContext* context) const override;
 };
 

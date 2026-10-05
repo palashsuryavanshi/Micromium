@@ -29,6 +29,7 @@ source_set("micromium_chrome") {
     "//base",
     "//components/prefs",
     "//components/keyed_service/content",
+    "//components/keyed_service/core",
     "//content/public/browser",
     "//micromium/components/micromium_adblock",
   ]

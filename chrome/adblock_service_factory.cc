@@ -28,7 +28,7 @@ AdblockServiceFactory::AdblockServiceFactory()
 AdblockServiceFactory::~AdblockServiceFactory() = default;
 
 std::unique_ptr<KeyedService>
-AdblockServiceFactory::BuildServiceInstanceFor(
+AdblockServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
   Profile* profile = Profile::FromBrowserContext(context);
   auto service = std::make_unique<AdblockService>();

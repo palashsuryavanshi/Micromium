@@ -10,6 +10,8 @@
 #ifndef MICROMIUM_CHROME_MICROMIUM_PRIVACY_HANDLER_H_
 #define MICROMIUM_CHROME_MICROMIUM_PRIVACY_HANDLER_H_
 
+#include "base/memory/raw_ptr.h"
+#include "base/values.h"
 #include "content/public/browser/web_ui_message_handler.h"
 
 class PrefService;

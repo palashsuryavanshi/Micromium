@@ -1,5 +1,6 @@
 #include "micromium_privacy_handler.h"
 
+#include "base/functional/bind.h"
 #include "base/values.h"
 #include "components/prefs/pref_service.h"
 #include "content/public/browser/web_ui.h"

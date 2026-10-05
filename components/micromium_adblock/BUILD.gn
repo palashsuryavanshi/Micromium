@@ -29,6 +29,7 @@ static_library("micromium_adblock") {
   ]
   deps = [
     "//base",
+    "//components/keyed_service/core",
     "//url",
     # NOTE: no compile-time dep on declarativeNetRequest — the engine only
     # emits DNR-compatible JSON, consumed at runtime by the chrome/ layer

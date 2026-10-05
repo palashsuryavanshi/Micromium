@@ -12,6 +12,7 @@
 
 #include "adblock_dnr_bridge.h"
 #include "adblock_engine.h"
+#include "components/keyed_service/core/keyed_service.h"
 #include "rust_matcher.h"
 
 namespace micromium {
@@ -21,7 +22,7 @@ namespace micromium {
 using DnrUpdateCallback =
     std::function<void(const std::string& dnr_json)>;
 
-class AdblockService {
+class AdblockService : public KeyedService {
  public:
   // |prefer_rust_engine| selects the adblock-rust backend when it was
   // compiled in (micromium_use_adblock_rust=true). Defaults to the
