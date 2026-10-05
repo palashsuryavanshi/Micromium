@@ -28,11 +28,11 @@ class MicromiumPrivacyHandler : public content::WebUIMessageHandler {
   void RegisterMessages() override;
 
  private:
-  void HandleGetPrefs(const base::Value::ListValue& args);
-  void HandleSetAdblockEnabled(const base::Value::ListValue& args);
-  void HandleSetAdblockAutoUpdate(const base::Value::ListValue& args);
-  void HandleSetMetricsOptIn(const base::Value::ListValue& args);
-  void HandleReset(const base::Value::ListValue& args);
+  void HandleGetPrefs(const base::ListValue& args);
+  void HandleSetAdblockEnabled(const base::ListValue& args);
+  void HandleSetAdblockAutoUpdate(const base::ListValue& args);
+  void HandleSetMetricsOptIn(const base::ListValue& args);
+  void HandleReset(const base::ListValue& args);
 
   void NotifyPrefsChanged();
 

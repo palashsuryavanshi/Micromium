@@ -39,13 +39,13 @@ void MicromiumPrivacyHandler::RegisterMessages() {
 }
 
 void MicromiumPrivacyHandler::HandleGetPrefs(
-    const base::Value::ListValue& args) {
+    const base::ListValue& args) {
   AllowJavascript();
   NotifyPrefsChanged();
 }
 
 void MicromiumPrivacyHandler::HandleSetAdblockEnabled(
-    const base::Value::ListValue& args) {
+    const base::ListValue& args) {
   if (args.empty() || !args[0].is_bool()) {
     return;
   }
@@ -58,7 +58,7 @@ void MicromiumPrivacyHandler::HandleSetAdblockEnabled(
 }
 
 void MicromiumPrivacyHandler::HandleSetAdblockAutoUpdate(
-    const base::Value::ListValue& args) {
+    const base::ListValue& args) {
   if (args.empty() || !args[0].is_bool()) {
     return;
   }
@@ -67,7 +67,7 @@ void MicromiumPrivacyHandler::HandleSetAdblockAutoUpdate(
 }
 
 void MicromiumPrivacyHandler::HandleSetMetricsOptIn(
-    const base::Value::ListValue& args) {
+    const base::ListValue& args) {
   if (args.empty() || !args[0].is_bool()) {
     return;
   }
@@ -76,7 +76,7 @@ void MicromiumPrivacyHandler::HandleSetMetricsOptIn(
 }
 
 void MicromiumPrivacyHandler::HandleReset(
-    const base::Value::ListValue& args) {
+    const base::ListValue& args) {
   prefs_->SetBoolean(kAdblockEnabled, true);
   prefs_->SetBoolean(kAdblockAutoUpdate, true);
   prefs_->SetBoolean(kMetricsOptIn, false);
@@ -87,7 +87,7 @@ void MicromiumPrivacyHandler::HandleReset(
 }
 
 void MicromiumPrivacyHandler::NotifyPrefsChanged() {
-  base::Value::DictValue prefs;
+  base::DictValue prefs;
   prefs.Set("adblockEnabled", prefs_->GetBoolean(kAdblockEnabled));
   prefs.Set("adblockAutoUpdate", prefs_->GetBoolean(kAdblockAutoUpdate));
   prefs.Set("metricsOptIn", prefs_->GetBoolean(kMetricsOptIn));
