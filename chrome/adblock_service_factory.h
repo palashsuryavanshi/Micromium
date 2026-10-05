@@ -6,6 +6,11 @@
 
 #include "components/keyed_service/content/browser_context_keyed_service_factory.h"
 
+namespace base {
+template <typename T>
+class NoDestructor;
+}  // namespace base
+
 namespace content {
 class BrowserContext;
 }  // namespace content
@@ -20,6 +25,8 @@ class AdblockServiceFactory : public BrowserContextKeyedServiceFactory {
   static AdblockServiceFactory* GetInstance();
 
  private:
+  friend class base::NoDestructor<AdblockServiceFactory>;
+
   AdblockServiceFactory();
   ~AdblockServiceFactory() override;
 
