@@ -1,11 +1,11 @@
 From: Micromium <micromium@example.local>
 Date: Mon, 21 Sep 2026 00:00:00 +0000
-Subject: [PATCH 5/7] Micromium privacy settings page + prefs wiring
+Subject: [PATCH 5/7] Micromium privacy settings page + prefs wiring (live)
 
-- Registers micromium.* profile prefs at startup
-- Adds MicromiumPrivacyHandler to SettingsUI
-- Adds MICROMIUM_PRIVACY route + frontend sources
+- Registers micromium.* profile prefs at startup (real call)
 - Depends on //micromium/chrome (copied by overlay)
+- Attaches MicromiumPrivacyHandler to SettingsUI (real handler)
+- Adds MICROMIUM_PRIVACY route + type entry (real route)
 
 Applies after 0004 (its BUILD.gn context is the post-0004 state).
 Rebased against Chromium 153.0.8010.27 (branch 1681091).
@@ -22,26 +22,70 @@ Rebased against Chromium 153.0.8010.27 (branch 1681091).
    ]
 --- a/chrome/browser/prefs/browser_prefs.cc
 +++ b/chrome/browser/prefs/browser_prefs.cc
-@@ -6,3 +6,5 @@
- #include "chrome/browser/prefs/browser_prefs.h"
+@@ -586,5 +586,8 @@
+ #if BUILDFLAG(CHROME_FOR_TESTING)
+ #include "chrome/browser/chrome_for_testing/prefs.h"
+ #endif
  
-+// Micromium: micromium.* profile prefs registered here at startup
-+// (adblock on, auto-update on, metrics opt-in off). See default flags.
- #include <array>
++// Micromium: profile prefs (adblock + privacy). See micromium/chrome/.
++#include "micromium/chrome/micromium_prefs.h"
++
+ namespace {
+--- a/chrome/browser/prefs/browser_prefs.cc
++++ b/chrome/browser/prefs/browser_prefs.cc
+@@ -1813,2 +1813,4 @@
+   metrics::MetricsReportingChoiceService::RegisterProfilePrefs(registry);
++  // Micromium: adblock + privacy prefs (defaults: adblock on, metrics off).
++  micromium::RegisterMicromiumPrefs(registry);
+   NotificationDisplayServiceImpl::RegisterProfilePrefs(registry);
+--- a/chrome/browser/prefs/BUILD.gn
++++ b/chrome/browser/prefs/BUILD.gn
+@@ -32,2 +32,4 @@
+     "//components/sync_preferences",
++    # Micromium: profile prefs (micromium.*). See micromium/chrome/.
++    "//micromium/chrome",
+     "//mojo/public/cpp/bindings",
 --- a/chrome/browser/ui/webui/settings/settings_ui.cc
 +++ b/chrome/browser/ui/webui/settings/settings_ui.cc
-@@ -6,3 +6,5 @@
+@@ -5,3 +5,6 @@
  #include "chrome/browser/ui/webui/settings/settings_ui.h"
  
-+// Micromium: MicromiumPrivacyHandler attached here so
-+// chrome://settings/micromium-privacy toggles AdblockService live.
++// Micromium: privacy + adblock settings page (chrome://settings/micromium-privacy).
++#include "micromium/chrome/adblock_service_factory.h"
++#include "micromium/chrome/micromium_privacy_handler.h"
  #include <stddef.h>
+--- a/chrome/browser/ui/webui/settings/settings_ui.cc
++++ b/chrome/browser/ui/webui/settings/settings_ui.cc
+@@ -474,4 +474,10 @@
+   // Add the metrics handler to write uma stats.
+   web_ui->AddMessageHandler(std::make_unique<MetricsHandler>());
+ 
++  // Micromium: privacy + adblock settings page handler. Pulls
++  // AdblockServiceFactory::GetForProfile(profile), creating the per-profile
++  // service (with bundled lists loaded) on first settings-page open.
++  web_ui->AddMessageHandler(std::make_unique<MicromiumPrivacyHandler>(
++      profile->GetPrefs(),
++      micromium::AdblockServiceFactory::GetForProfile(profile)));
+   webui::SetupWebUIDataSource(html_source, kSettingsResources,
+--- a/chrome/browser/ui/webui/settings/BUILD.gn
++++ b/chrome/browser/ui/webui/settings/BUILD.gn
+@@ -71,2 +71,4 @@
+     "//chrome/common",
++    # Micromium: privacy settings page handler (micromium/chrome).
++    "//micromium/chrome",
+     "//components/content_settings/core/browser",
 --- a/chrome/browser/resources/settings/route.ts
 +++ b/chrome/browser/resources/settings/route.ts
-@@ -1,5 +1,6 @@
- // Copyright 2016 The Chromium Authors
- // Use of this source code is governed by a BSD-style license that can be
- // found in the LICENSE file.
+@@ -34,3 +34,5 @@
+   r.COOKIES = r.PRIVACY.createChild('/cookies');
  
-+// Micromium: MICROMIUM_PRIVACY subpage route ('/micromium-privacy').
- import {assert} from 'chrome://resources/js/assert.js';
++  // Micromium: privacy + adblock settings subpage.
++  r.MICROMIUM_PRIVACY = r.PRIVACY.createChild('/micromium-privacy');
+   if (loadTimeData.getBoolean('enableSecurityKeysSubpage')) {
+--- a/chrome/browser/resources/settings/router.ts
++++ b/chrome/browser/resources/settings/router.ts
+@@ -44,2 +44,4 @@
+   MANAGE_PROFILE: Route;
++  // Micromium: privacy + adblock settings subpage.
++  MICROMIUM_PRIVACY: Route;
+   OFFER_WRITING_HELP: Route;

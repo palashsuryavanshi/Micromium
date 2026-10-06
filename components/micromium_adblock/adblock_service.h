@@ -22,6 +22,13 @@ namespace micromium {
 using DnrUpdateCallback =
     std::function<void(const std::string& dnr_json)>;
 
+// Bundled fallback filter text, compiled in so the engine has rules from
+// first run without waiting on a list download. Mirrors
+// filter_lists/youtube.txt plus the micromium-default sample rules;
+// keep in sync when those change. Full EasyList syntax arrives with the
+// adblock-rust backend (see rust_matcher.h).
+extern const char kMicromiumBundledFallbackFilters[];
+
 class AdblockService : public KeyedService {
  public:
   // |prefer_rust_engine| selects the adblock-rust backend when it was
@@ -44,9 +51,14 @@ class AdblockService : public KeyedService {
   bool ShouldBlock(const std::string& url) const;
   size_t rule_count() const { return engine_->rule_count(); }
 
+  // Last DNR JSON blob pushed via LoadAndPushRules ("[]" when disabled).
+  // Surfaced for the settings page ("N rules active") and tests.
+  const std::string& last_pushed_rules() const { return last_pushed_rules_; }
+
  private:
   std::unique_ptr<AdblockEngine> engine_;
   bool enabled_ = true;
+  std::string last_pushed_rules_ = "[]";
 };
 
 }  // namespace micromium

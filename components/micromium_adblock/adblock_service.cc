@@ -2,6 +2,21 @@
 
 namespace micromium {
 
+const char kMicromiumBundledFallbackFilters[] =
+    "ads.example.com\n"
+    "tracking.example.net\n"
+    "@@allow.ads.example.com/safe\n"
+    "youtube.com/api/stats/ads\n"
+    "youtube.com/pagead/\n"
+    "youtube.com/ptracking\n"
+    "youtube.com/api/stats/qoe\n"
+    "youtube.com/api/stats/delayplay\n"
+    "youtube.com/generate_204\n"
+    "doubleclick.net\n"
+    "googlesyndication.com\n"
+    "googleadservices.com\n"
+    "imasdk.googleapis.com\n";
+
 AdblockService::AdblockService(bool prefer_rust_engine)
     : engine_(CreateAdblockEngine(prefer_rust_engine)) {}
 AdblockService::~AdblockService() = default;
@@ -13,8 +28,9 @@ void AdblockService::SetEnabled(bool enabled) {
 void AdblockService::LoadAndPushRules(const std::string& filter_text,
                                       DnrUpdateCallback cb) {
   if (!enabled_) {
+    last_pushed_rules_ = "[]";
     if (cb) {
-      cb("[]");  // clear all dynamic rules
+      cb(last_pushed_rules_);  // clear all dynamic rules
     }
     return;
   }
@@ -55,7 +71,8 @@ void AdblockService::LoadAndPushRules(const std::string& filter_text,
     pos = end + 1;
   }
   if (cb) {
-    cb(AdblockDnrBridge::ToDnrJson(dnr));
+    last_pushed_rules_ = AdblockDnrBridge::ToDnrJson(dnr);
+    cb(last_pushed_rules_);
   }
 }
 

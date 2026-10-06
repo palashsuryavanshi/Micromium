@@ -82,11 +82,30 @@ COMMON_ANCHORS = {
         '#include "chrome/browser/prefs/browser_prefs.h"\n'
         "\n"
         "#include <array>\n"
+        '#if BUILDFLAG(CHROME_FOR_TESTING)\n'
+        '#include "chrome/browser/chrome_for_testing/prefs.h"\n'
+        "#endif\n"
+        "\n"
+        "namespace {\n"
+        "  metrics::MetricsReportingChoiceService::RegisterProfilePrefs(registry);\n"
+        "  NotificationDisplayServiceImpl::RegisterProfilePrefs(registry);\n"
+    ),
+    "chrome/browser/prefs/BUILD.gn": (
+        '    "//components/sync_preferences",\n'
+        '    "//mojo/public/cpp/bindings",\n'
     ),
     "chrome/browser/ui/webui/settings/settings_ui.cc": (
         '#include "chrome/browser/ui/webui/settings/settings_ui.h"\n'
         "\n"
         "#include <stddef.h>\n"
+        '  // Add the metrics handler to write uma stats.\n'
+        '  web_ui->AddMessageHandler(std::make_unique<MetricsHandler>());\n'
+        "\n"
+        "  webui::SetupWebUIDataSource(html_source, kSettingsResources,\n"
+    ),
+    "chrome/browser/ui/webui/settings/BUILD.gn": (
+        '    "//chrome/common",\n'
+        '    "//components/content_settings/core/browser",\n'
     ),
     "chrome/browser/resources/settings/route.ts": (
         "// Copyright 2016 The Chromium Authors\n"
@@ -94,6 +113,13 @@ COMMON_ANCHORS = {
         "// found in the LICENSE file.\n"
         "\n"
         "import {assert} from 'chrome://resources/js/assert.js';\n"
+        "  r.COOKIES = r.PRIVACY.createChild('/cookies');\n"
+        "\n"
+        "  if (loadTimeData.getBoolean('enableSecurityKeysSubpage')) {\n"
+    ),
+    "chrome/browser/resources/settings/router.ts": (
+        "  MANAGE_PROFILE: Route;\n"
+        "  OFFER_WRITING_HELP: Route;\n"
     ),
 }
 

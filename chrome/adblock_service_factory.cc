@@ -37,6 +37,12 @@ AdblockServiceFactory::BuildServiceInstanceForBrowserContext(
   bool enabled =
       profile->GetPrefs()->GetBoolean(micromium::kAdblockEnabled);
   service->SetEnabled(enabled);
+  // Load the compiled-in fallback lists so the engine matches from first
+  // run. The JSON callback is a no-op until the DNR RulesMonitor binding
+  // lands (see RUST_BACKEND.md notes in micromium_adblock); until then the
+  // service answers ShouldBlock() queries and records last_pushed_rules().
+  service->LoadAndPushRules(kMicromiumBundledFallbackFilters,
+                            [](const std::string&) {});
   return service;
 }
 
