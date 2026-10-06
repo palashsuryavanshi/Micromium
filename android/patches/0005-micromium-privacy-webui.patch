@@ -43,7 +43,7 @@ Rebased against Chromium 153.0.8010.27 (branch 1681091).
 @@ -32,2 +32,4 @@
      "//components/sync_preferences",
 +    # Micromium: profile prefs (micromium.*). See micromium/chrome/.
-+    "//micromium/chrome",
++    "//micromium/chrome:micromium_chrome",
      "//mojo/public/cpp/bindings",
 --- a/chrome/browser/ui/webui/settings/settings_ui.cc
 +++ b/chrome/browser/ui/webui/settings/settings_ui.cc
@@ -72,7 +72,7 @@ Rebased against Chromium 153.0.8010.27 (branch 1681091).
 @@ -71,2 +71,4 @@
      "//chrome/common",
 +    # Micromium: privacy settings page handler (micromium/chrome).
-+    "//micromium/chrome",
++    "//micromium/chrome:micromium_chrome",
      "//components/content_settings/core/browser",
 --- a/chrome/browser/resources/settings/route.ts
 +++ b/chrome/browser/resources/settings/route.ts
