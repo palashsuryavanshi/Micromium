@@ -121,6 +121,26 @@ COMMON_ANCHORS = {
         "  MANAGE_PROFILE: Route;\n"
         "  OFFER_WRITING_HELP: Route;\n"
     ),
+    "build/toolchain/win/setup_toolchain.py": (
+        "import gn_helpers\n"
+        "\n"
+        "SCRIPT_DIR = os.path.dirname(__file__)\n"
+        "SDK_VERSION = '10.0.28000.0'\n"
+        "MSVC_DIR = re.compile('^.*/VC/Tools/MSVC/[^/]+/include$')\n"
+        "WINDOWS_KITS_DIR = re.compile(r'^(.*/Windows Kits/\\d+/Include/[^/]+)/.*')\n"
+    ),
+    "build/vs_toolchain.py": (
+        "TOOLCHAIN_HASH = '3bfcb536c8'\n"
+        "SDK_VERSION = '10.0.28000.0'\n"
+        "\n"
+        "# Visual Studio versions are listed in descending order of priority.\n"
+    ),
+    "build/config/win/BUILD.gn": (
+        '  defines = [\n'
+        '    "NTDDI_VERSION=NTDDI_WIN11_BR",\n'
+        "\n"
+        "    # We can't say `=_WIN32_WINNT_WIN10` here because some files do\n"
+    ),
 }
 
 PLATFORM_ANCHORS = {

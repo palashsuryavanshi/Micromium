@@ -15,6 +15,7 @@ Exit 0 = ready, 1 = problems found.
 """
 import json
 import py_compile
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -152,7 +153,8 @@ def main() -> int:
     for plat in ["windows", "android", "linux"]:
         entries = [l.strip() for l in (ROOT / plat / "patches" / "SERIES").read_text().splitlines()
                    if l.strip() and not l.strip().startswith("#")]
-        shared = [e for e in entries if not e.startswith("0006-") and not e.startswith("0007-")]
+        shared = [e for e in entries
+                  if not re.match(r"^000[678]-", e)]
         if base is None:
             base = shared
             ok(f"{plat} defines shared baseline ({len(shared)} patches)")

@@ -1,0 +1,57 @@
+From: Micromium <micromium@example.local>
+Date: Mon, 21 Sep 2026 00:00:00 +0000
+Subject: [PATCH 8/8] Windows SDK 26100 compatibility (Micromium)
+
+Chromium 153 pins Windows SDK 10.0.28000.0 (Insider-only at the time of
+writing) in three places and targets NTDDI_WIN11_BR throughout. This patch
+retargets the Windows build at the public 10.0.26100.0 SDK so stock
+VS2022 + public SDK builds work out of the box:
+
+- build/toolchain/win/setup_toolchain.py + build/vs_toolchain.py:
+  SDK_VERSION 28000 -> 26100 (the two files document that these pins must
+  stay in sync; both are updated together here).
+- build/config/win/BUILD.gn (winver config): NTDDI_VERSION WIN11_BR ->
+  WIN11_GE (the highest level SDK 26100 defines), plus an explicit
+  NTDDI_WIN11_BR=0x0A000011 define because base/win/windows_version.cc
+  hard-gates on that macro existing.
+
+Proven by a full local `autoninja chrome` build (Windows x64, VS 17.14
+MSVC 19.44, SDK 26100): 33k+ targets compile and chrome.exe links and
+renders. If upstream code ever uses a genuinely-28000-only SDK API, the
+failing TU names it and this patch gets revisited.
+
+Rebased against Chromium 153.0.8010.27 (branch 1681091).
+
+--- a/build/toolchain/win/setup_toolchain.py
++++ b/build/toolchain/win/setup_toolchain.py
+@@ -21,6 +21,8 @@
+ import gn_helpers
+ 
+ SCRIPT_DIR = os.path.dirname(__file__)
+-SDK_VERSION = '10.0.28000.0'
++# Micromium (Windows): build against the public 26100 SDK; upstream pins
++# 10.0.28000.0 (Insider-only at the time of writing). See windows/README.md.
++SDK_VERSION = '10.0.26100.0'
+ MSVC_DIR = re.compile('^.*/VC/Tools/MSVC/[^/]+/include$')
+ WINDOWS_KITS_DIR = re.compile(r'^(.*/Windows Kits/\d+/Include/[^/]+)/.*')
+--- a/build/vs_toolchain.py
++++ b/build/vs_toolchain.py
+@@ -62,4 +62,5 @@
+ TOOLCHAIN_HASH = '3bfcb536c8'
+-SDK_VERSION = '10.0.28000.0'
++# Micromium (Windows): must stay in sync with setup_toolchain.py (26100).
++SDK_VERSION = '10.0.26100.0'
+ 
+ # Visual Studio versions are listed in descending order of priority.
+--- a/build/config/win/BUILD.gn
++++ b/build/config/win/BUILD.gn
+@@ -307,4 +307,8 @@
+   defines = [
+-    "NTDDI_VERSION=NTDDI_WIN11_BR",
++    # Micromium (Windows): target the public 26100 SDK instead of the
++    # pinned 28000 SDK (Insider-only). NTDDI_WIN11_BR is defined manually
++    # because base/win/windows_version.cc gates on it. See windows/README.md.
++    "NTDDI_VERSION=NTDDI_WIN11_GE",
++    "NTDDI_WIN11_BR=0x0A000011",
+ 
+     # We can't say `=_WIN32_WINNT_WIN10` here because some files do
