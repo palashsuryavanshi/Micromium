@@ -63,7 +63,7 @@ Rebased against Chromium 153.0.8010.27 (branch 1681091).
 +  // Micromium: privacy + adblock settings page handler. Pulls
 +  // AdblockServiceFactory::GetForProfile(profile), creating the per-profile
 +  // service (with bundled lists loaded) on first settings-page open.
-+  web_ui->AddMessageHandler(std::make_unique<MicromiumPrivacyHandler>(
++  web_ui->AddMessageHandler(std::make_unique<micromium::MicromiumPrivacyHandler>(
 +      profile->GetPrefs(),
 +      micromium::AdblockServiceFactory::GetForProfile(profile)));
    webui::SetupWebUIDataSource(html_source, kSettingsResources,
